@@ -1,6 +1,6 @@
 import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 from app.models.job import JobStatus, JobResponse
 from app.services.storage import InMemoryJobStore
 from app.services.ollama import OllamaClient
@@ -16,12 +16,18 @@ async def test_process_job_ollama_unavailable():
     await store.create(job)
 
     ollama = MagicMock(spec=OllamaClient)
-    ollama.ensure_model.side_effect = Exception("Ollama unreachable")
+    ollama.ensure_model = AsyncMock(side_effect=Exception("Ollama unreachable"))
+    ollama.health_check = AsyncMock(return_value=False)
+    ollama.is_model_loaded = AsyncMock(return_value=False)
+    ollama.ocr_image = AsyncMock(return_value="test")
+    ollama.model = "test-model"
 
     pdf_path = Path("/tmp/fake.pdf")
     pdf_path.write_bytes(b"fake")
 
-    await process_job("test123", pdf_path, store, ollama)
+    # Mock pdf_to_images to avoid needing a real PDF
+    with patch("app.worker.pdf_to_images", return_value=[Path("/tmp/fake.png")]):
+        await process_job("test123", pdf_path, store, ollama)
 
     result = await store.get("test123")
     assert result.status == JobStatus.FAILED

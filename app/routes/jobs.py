@@ -5,7 +5,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.responses import PlainTextResponse
 from app.config import settings
 from app.models.job import JobResponse, JobStatus
-from app.dependencies import get_store, get_ollama
+from app.dependencies import get_store, get_ollama, get_mlx, get_ocr_client
 from app.worker import process_job
 
 router = APIRouter()
@@ -41,11 +41,11 @@ async def upload(
     store = get_store()
     await store.create(job)
 
-    ollama = get_ollama()
+    client = get_ocr_client()
     if background_tasks:
-        background_tasks.add_task(process_job, job_id, save_path, store, ollama)
+        background_tasks.add_task(process_job, job_id, save_path, store, client)
     else:
-        await process_job(job_id, save_path, store, ollama)
+        await process_job(job_id, save_path, store, client)
 
     return job
 

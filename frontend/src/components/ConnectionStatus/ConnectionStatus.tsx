@@ -1,19 +1,25 @@
 import { useState, useEffect } from "react";
 import { healthApi } from "../../api/client";
-import type { HealthResponse } from "../../types/job";
 import "./ConnectionStatus.css";
 
+interface HealthData {
+  available: boolean;
+  model: string;
+  model_loaded: boolean;
+  backend: string;
+}
+
 export default function ConnectionStatus() {
-  const [health, setHealth] = useState<HealthResponse | null>(null);
+  const [health, setHealth] = useState<HealthData | null>(null);
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     const check = async () => {
       try {
         const h = await healthApi.check();
-        setHealth(h);
+        setHealth(h as unknown as HealthData);
       } catch {
-        setHealth({ ollama_available: false, model: "glm-ocr", model_loaded: false });
+        setHealth({ available: false, model: "unknown", model_loaded: false, backend: "unknown" });
       } finally {
         setChecking(false);
       }
@@ -23,14 +29,15 @@ export default function ConnectionStatus() {
     return () => clearInterval(interval);
   }, []);
 
-  const isConnected = health?.ollama_available && health?.model_loaded;
-  const isPartial = health?.ollama_available && !health?.model_loaded;
+  const isConnected = health?.available && health?.model_loaded;
+  const isPartial = health?.available && !health?.model_loaded;
+  const backendLabel = health?.backend === "mlx" ? "MLX" : "Ollama";
 
   return (
     <div className={`conn-status ${checking ? "conn-status--checking" : ""} ${isConnected ? "conn-status--connected" : ""} ${isPartial ? "conn-status--partial" : ""} ${!checking && !isConnected && !isPartial ? "conn-status--error" : ""}`}>
       <div className="conn-dot" />
       <span className="conn-label">
-        {checking ? "Checking…" : isConnected ? "Ollama connected" : isPartial ? "Model not loaded" : "Ollama offline"}
+        {checking ? "Checking…" : isConnected ? `${backendLabel} connected` : isPartial ? `${backendLabel} model not loaded` : `${backendLabel} offline`}
       </span>
       {health && (
         <span className="conn-model">{health.model}</span>

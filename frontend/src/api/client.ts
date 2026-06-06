@@ -42,3 +42,12 @@ export const jobsApi = {
 export const healthApi = {
   check: () => request<HealthResponse>("/health"),
 };
+
+export const backendApi = {
+  get: () => request<{ backend: string; ollama_url: string; mlx_url: string; mlx_model: string }>("/backend"),
+  switch: (backend: string) =>
+    request<{ backend: string; status: string; model: string }>("/backend", {
+      method: "POST",
+      body: JSON.stringify({ backend }),
+    }),
+};

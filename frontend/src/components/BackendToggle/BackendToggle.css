@@ -1,0 +1,80 @@
+.backend-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.backend-toggle-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.backend-toggle-options {
+  display: flex;
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.backend-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.backend-toggle-btn:first-child {
+  border-right: 2px solid var(--border-strong);
+}
+
+.backend-toggle-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.backend-toggle-btn--active {
+  background: var(--text);
+  color: var(--bg-elevated);
+}
+
+.backend-toggle-btn--active:hover:not(:disabled) {
+  background: var(--text);
+  color: var(--bg-elevated);
+  opacity: 0.85;
+}
+
+.backend-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.backend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.backend-dot--online {
+  background: var(--success);
+  box-shadow: 0 0 4px rgba(22, 163, 74, 0.5);
+}
+
+.backend-dot--offline {
+  background: var(--error);
+}
+
+.backend-dot--unknown {
+  background: var(--text-muted);
+}

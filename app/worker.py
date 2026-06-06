@@ -1,24 +1,28 @@
 import asyncio
 import shutil
 from pathlib import Path
-from app.config import settings
+from app.config import settings, OcrBackend
 from app.models.job import JobStatus
 from app.services.pdf import pdf_to_images
-from app.services.ollama import OllamaClient, OllamaError
 from app.services.storage import JobStore
+from app.dependencies import get_ocr_client
 
-async def process_job(job_id: str, pdf_path: Path, store: JobStore, ollama: OllamaClient):
+
+async def process_job(job_id: str, pdf_path: Path, store: JobStore, ocr_client=None):
     job = await store.get(job_id)
     if not job:
         return
 
+    client = ocr_client if ocr_client is not None else get_ocr_client()
+    backend_label = "MLX" if settings.ocr_backend == OcrBackend.MLX else "Ollama"
+
     await store.update(job_id, status=JobStatus.PROCESSING, progress=0)
 
     try:
-        await store.update(job_id, status_text="Checking model…")
+        await store.update(job_id, status_text=f"Checking {backend_label}…")
         try:
-            await ollama.ensure_model()
-        except OllamaError as e:
+            await client.ensure_model()
+        except Exception as e:
             await store.update(job_id, status=JobStatus.FAILED, error=str(e))
             return
 
@@ -36,7 +40,7 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ollama: Olla
                 status_text=f"Extracting text from page {page_num} of {total}",
                 progress=int((page_num / total) * 80) + 10,
             )
-            text = await ollama.ocr_image(img_path)
+            text = await client.ocr_image(img_path)
             pages.append(f"## Page {page_num}\n\n{text}")
             await store.update(
                 job_id,
