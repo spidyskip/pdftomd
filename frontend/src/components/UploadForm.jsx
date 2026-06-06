@@ -18,7 +18,7 @@ const UploadForm = ({ onJobCreated }) => {
         const formData = new FormData()
         formData.append('file', file)
 
-        const response = await fetch(`${API_BASE}/upload`, {
+        const response = await fetch(`${API_BASE}/jobs`, {
           method: 'POST',
           body: formData,
         })

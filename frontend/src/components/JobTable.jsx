@@ -34,7 +34,7 @@ const JobTable = ({ jobs, onRemoveJob, onPreview }) => {
 
   const handleDownload = async (job) => {
     try {
-      const res = await fetch(`${API_BASE}/result/${job.id}`)
+      const res = await fetch(`${API_BASE}/jobs/${job.id}/result`)
       if (!res.ok) throw new Error('Result not ready')
       const text = await res.text()
       const blob = new Blob([text], { type: 'text/markdown' })
@@ -51,7 +51,7 @@ const JobTable = ({ jobs, onRemoveJob, onPreview }) => {
 
   const handleView = async (job) => {
     try {
-      const res = await fetch(`${API_BASE}/result/${job.id}`)
+      const res = await fetch(`${API_BASE}/jobs/${job.id}/result`)
       if (!res.ok) throw new Error('Result not ready')
       const text = await res.text()
       onPreview(text, job.filename)
