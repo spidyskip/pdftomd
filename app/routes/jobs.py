@@ -18,10 +18,14 @@ async def upload(
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Only PDF files are accepted")
 
+    contents = await file.read()
+    if len(contents) > settings.max_file_size:
+        raise HTTPException(413, f"File too large (max {settings.max_file_size // (1024*1024)} MB)")
+
     job_id = str(uuid.uuid4())[:8]
     settings.upload_dir.mkdir(parents=True, exist_ok=True)
     save_path = settings.upload_dir / f"{job_id}_{file.filename}"
-    save_path.write_bytes(await file.read())
+    save_path.write_bytes(contents)
 
     job = JobResponse(
         id=job_id,

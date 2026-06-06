@@ -17,7 +17,7 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ollama: Olla
     try:
         await store.update(job_id, status_text="Checking model…")
         try:
-            ollama.ensure_model()
+            await asyncio.to_thread(ollama.ensure_model)
         except OllamaError as e:
             await store.update(job_id, status=JobStatus.FAILED, error=str(e))
             return
@@ -35,7 +35,7 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ollama: Olla
                 status_text=f"OCR page {i + 1}/{total}",
                 progress=int((i + 1) / total * 100),
             )
-            text = ollama.ocr_image(img_path)
+            text = await asyncio.to_thread(ollama.ocr_image, img_path)
             pages.append(f"## Page {i + 1}\n\n{text}")
 
         md = "\n\n---\n\n".join(pages)
@@ -53,4 +53,5 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ollama: Olla
         await store.update(job_id, status=JobStatus.FAILED, error=str(exc))
 
     finally:
-        shutil.rmtree(temp_dir, ignore_errors=True)
+        if 'temp_dir' in locals():
+            shutil.rmtree(temp_dir, ignore_errors=True)
