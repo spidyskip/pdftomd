@@ -8,6 +8,14 @@
   margin-bottom: var(--space-xl);
 }
 
+.app-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xs);
+}
+
 .app-header h1 {
   font-family: var(--font);
   font-size: 1.35rem;
@@ -20,7 +28,6 @@
 .app-header p {
   font-size: 0.8rem;
   color: var(--text-muted);
-  margin-top: var(--space-xs);
   max-width: 40ch;
 }
 
