@@ -17,7 +17,7 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ollama: Olla
     try:
         await store.update(job_id, status_text="Checking model…")
         try:
-            await asyncio.to_thread(ollama.ensure_model)
+            await ollama.ensure_model()
         except OllamaError as e:
             await store.update(job_id, status=JobStatus.FAILED, error=str(e))
             return
@@ -26,7 +26,7 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ollama: Olla
         temp_dir = settings.temp_image_dir / job_id
         images = await asyncio.to_thread(pdf_to_images, str(pdf_path), temp_dir)
         total = len(images)
-        await store.update(job_id, page_count=total)
+        await store.update(job_id, page_count=total, status_text="Starting OCR…")
 
         pages = []
         for i, img_path in enumerate(images):
@@ -36,7 +36,7 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ollama: Olla
                 status_text=f"Extracting text from page {page_num} of {total}",
                 progress=int((page_num / total) * 80) + 10,
             )
-            text = await asyncio.to_thread(ollama.ocr_image, img_path)
+            text = await ollama.ocr_image(img_path)
             pages.append(f"## Page {page_num}\n\n{text}")
             await store.update(
                 job_id,

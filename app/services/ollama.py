@@ -1,6 +1,6 @@
 import base64
-import requests
 from pathlib import Path
+import httpx
 from app.config import settings
 
 class OllamaError(Exception):
@@ -8,42 +8,44 @@ class OllamaError(Exception):
 
 class OllamaClient:
     def __init__(self, base_url: str = None, model: str = None):
-        self.base_url = base_url or settings.ollama_url
+        self.base_url = (base_url or settings.ollama_url).rstrip("/")
         self.model = model or settings.model_name
 
-    def health_check(self) -> bool:
+    async def health_check(self) -> bool:
         try:
-            r = requests.get(f"{self.base_url}/api/tags", timeout=5)
-            return r.status_code == 200
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                r = await client.get(f"{self.base_url}/api/tags")
+                return r.status_code == 200
         except Exception:
             return False
 
-    def is_model_loaded(self) -> bool:
+    async def is_model_loaded(self) -> bool:
         try:
-            r = requests.get(f"{self.base_url}/api/tags", timeout=5)
-            if r.status_code != 200:
-                return False
-            names = [m["name"] for m in r.json().get("models", [])]
-            return any(self.model in n for n in names)
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                r = await client.get(f"{self.base_url}/api/tags")
+                if r.status_code != 200:
+                    return False
+                names = [m["name"] for m in r.json().get("models", [])]
+                return any(self.model in n for n in names)
         except Exception:
             return False
 
-    def ensure_model(self) -> bool:
-        if self.is_model_loaded():
+    async def ensure_model(self) -> bool:
+        if await self.is_model_loaded():
             return True
         if not settings.auto_pull_model:
             return False
         try:
-            r = requests.post(
-                f"{self.base_url}/api/pull",
-                json={"name": self.model, "stream": False},
-                timeout=600,
-            )
-            return r.status_code == 200
+            async with httpx.AsyncClient(timeout=600.0) as client:
+                r = await client.post(
+                    f"{self.base_url}/api/pull",
+                    json={"name": self.model, "stream": False},
+                )
+                return r.status_code == 200
         except Exception as e:
             raise OllamaError(f"Failed to pull model: {e}")
 
-    def ocr_image(self, image_path: Path) -> str:
+    async def ocr_image(self, image_path: Path) -> str:
         b64 = base64.b64encode(image_path.read_bytes()).decode()
         payload = {
             "model": self.model,
@@ -55,20 +57,23 @@ class OllamaClient:
             "stream": False,
         }
         try:
-            r = requests.post(
-                f"{self.base_url}/api/generate",
-                json=payload,
-                timeout=300,
-            )
-            if r.status_code != 200:
-                raise OllamaError(f"Ollama returned {r.status_code}: {r.text[:200]}")
-            return r.json().get("response", "").strip()
-        except requests.Timeout:
+            async with httpx.AsyncClient(timeout=300.0) as client:
+                r = await client.post(
+                    f"{self.base_url}/api/generate",
+                    json=payload,
+                )
+                if r.status_code != 200:
+                    raise OllamaError(f"Ollama returned {r.status_code}: {r.text[:200]}")
+                return r.json().get("response", "").strip()
+        except httpx.TimeoutException:
             raise OllamaError(
                 "Ollama timed out after 300s. "
-                "The model may be too large for your hardware."
+                "The model may be too large for your hardware or Ollama is overloaded."
             )
-        except requests.ConnectionError:
+        except httpx.ConnectError:
             raise OllamaError(
-                "Cannot connect to Ollama. Make sure Ollama is running."
+                f"Cannot connect to Ollama at {self.base_url}. "
+                "Make sure Ollama is running."
             )
+        except httpx.HTTPStatusError as e:
+            raise OllamaError(f"Ollama HTTP error: {e.response.status_code}")

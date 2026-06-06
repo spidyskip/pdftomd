@@ -5,13 +5,14 @@ from app.config import settings
 from app.dependencies import get_ollama
 from app.routes.health import router as health_router
 from app.routes.jobs import router as jobs_router
+from app.mcp_server import mcp
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     ollama = get_ollama()
     if settings.auto_pull_model:
         try:
-            ollama.ensure_model()
+            await ollama.ensure_model()
         except Exception:
             pass
     yield
@@ -31,5 +32,8 @@ def create_app() -> FastAPI:
     )
     app.include_router(health_router, prefix="/api")
     app.include_router(jobs_router, prefix="/api/jobs")
+
+    # Mount MCP server at /mcp endpoint
+    app.mount("/mcp", mcp.sse_app())
 
     return app

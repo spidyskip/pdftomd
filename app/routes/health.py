@@ -8,7 +8,7 @@ router = APIRouter()
 async def health():
     ollama = get_ollama()
     return HealthResponse(
-        ollama_available=ollama.health_check(),
+        ollama_available=await ollama.health_check(),
         model=ollama.model,
-        model_loaded=ollama.is_model_loaded(),
+        model_loaded=await ollama.is_model_loaded(),
     )
