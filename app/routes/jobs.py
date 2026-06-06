@@ -68,9 +68,11 @@ async def get_result(job_id: str):
     job = await store.get(job_id)
     if not job:
         raise HTTPException(404, "Job not found")
-    if job.status != JobStatus.FINISHED:
-        raise HTTPException(400, "Job not finished yet")
     out_path = settings.result_dir / f"{job_id}.md"
+    if not out_path.exists():
+        if job.status == JobStatus.PROCESSING:
+            raise HTTPException(202, "Processing in progress — no output yet")
+        raise HTTPException(404, "Result not found")
     return out_path.read_text(encoding="utf-8")
 
 @router.delete("/{job_id}")

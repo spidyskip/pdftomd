@@ -1,4 +1,4 @@
-import { Job, HealthResponse, ApiError } from "../types/job";
+import { Job, ApiError } from "../types/job";
 
 const API_BASE = import.meta.env.VITE_API_URL || "/api";
 
@@ -40,7 +40,8 @@ export const jobsApi = {
 };
 
 export const healthApi = {
-  check: () => request<HealthResponse>("/health"),
+  check: () => request("/health"),
+  checkAll: () => request("/health/all"),
 };
 
 export const backendApi = {

@@ -16,11 +16,12 @@ export default function BackendToggle() {
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        const h = await healthApi.check() as unknown as { available: boolean; backend: string };
-        // The health endpoint checks the active backend
-        // We need to check both separately
-        setOllamaAvailable(h.backend === "ollama" ? h.available : null);
-        setMlxAvailable(h.backend === "mlx" ? h.available : null);
+        const h = await healthApi.checkAll() as {
+          ollama: { available: boolean; model_loaded: boolean };
+          mlx: { available: boolean; model_loaded: boolean };
+        };
+        setOllamaAvailable(h.ollama.available && h.ollama.model_loaded);
+        setMlxAvailable(h.mlx.available && h.mlx.model_loaded);
       } catch {
         setOllamaAvailable(false);
         setMlxAvailable(false);

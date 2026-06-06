@@ -17,15 +17,20 @@ export default function LivePreview({ job, onClose }: Props) {
 
   useEffect(() => {
     let cancelled = false;
+    let pollInterval: number;
 
     const fetchContent = async () => {
       try {
         const text = await jobsApi.getResult(job.id);
-        if (!cancelled) {
+        if (!cancelled && text) {
           setContent(text);
           setIsLoading(false);
+          const matches = text.match(/## Page \d+/g);
+          if (matches) setCurrentPage(matches.length - 1);
         }
-      } catch {
+      } catch (err: unknown) {
+        // 202 = processing, not ready yet — keep polling
+        // 404 = no output yet
         if (!cancelled) setIsLoading(false);
       }
     };
@@ -33,25 +38,25 @@ export default function LivePreview({ job, onClose }: Props) {
     fetchContent();
 
     // Poll for updates while processing
-    const interval = setInterval(async () => {
-      if (job.status === "finished") {
-        clearInterval(interval);
-        return;
-      }
-      try {
-        const text = await jobsApi.getResult(job.id);
-        if (!cancelled && text) {
-          setContent(text);
-          // Count how many pages have been processed
-          const matches = text.match(/## Page \d+/g);
-          if (matches) setCurrentPage(matches.length);
+    if (job.status === "processing") {
+      pollInterval = window.setInterval(async () => {
+        try {
+          const text = await jobsApi.getResult(job.id);
+          if (!cancelled && text) {
+            setContent(text);
+            setIsLoading(false);
+            const matches = text.match(/## Page \d+/g);
+            if (matches) setCurrentPage(matches.length - 1);
+          }
+        } catch {
+          // Not ready yet, keep polling
         }
-      } catch { /* not ready yet */ }
-    }, 2000);
+      }, 3000);
+    }
 
     return () => {
       cancelled = true;
-      clearInterval(interval);
+      if (pollInterval) clearInterval(pollInterval);
     };
   }, [job.id, job.status]);
 

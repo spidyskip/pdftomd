@@ -1,42 +1,77 @@
 # PDF to Markdown OCR
 
-A modern web-based tool that converts PDF documents to Markdown using **GLM-OCR** via Ollama. Built with **FastAPI** backend and **React** frontend.
+[![CI](https://github.com/spidyskip/pdftomd/actions/workflows/ci.yml/badge.svg)](https://github.com/spidyskip/pdftomd/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![React 18](https://img.shields.io/badge/react-18-61DAFB.svg?logo=react)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+Convert PDF documents to structured Markdown using **GLM-OCR**. Supports both **Ollama** and **MLX** (Apple Silicon) backends with a modern React frontend.
+
+## Features
+
+- **Dual OCR Backend** — Switch between Ollama and MLX (Apple Silicon) at runtime
+- **Live Preview** — Watch markdown output update in real-time as each page is processed
+- **Rich Progress Tracking** — 4-step progress indicator with per-page status
+- **Connection Status** — Live health monitoring for both backends with availability indicators
+- **Export** — Download results as Markdown files
+- **MCP Endpoint** — AI agent integration via `/mcp` (Model Context Protocol)
+- **Neo-Brutalist UI** — Notion-Ink inspired design with hard shadows and thick borders
 
 ## Architecture
 
 ```
-Frontend (React + Vite) → FastAPI Backend → Ollama / GLM-OCR → Markdown Output
+┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
+│  React + Vite   │────▶│   FastAPI        │────▶│  Ollama / MLX   │
+│  Frontend :5173 │     │   Backend :8000  │     │  GLM-OCR Model  │
+└─────────────────┘     └──────────────────┘     └─────────────────┘
+                               │
+                        ┌──────┴──────┐
+                        │  MCP :8000  │
+                        │  /mcp       │
+                        └─────────────┘
 ```
 
 ## Prerequisites
 
-- [Ollama](https://ollama.com/) installed and running
-- GLM-OCR model: `ollama pull glm-ocr`
+### Common
 - `pdftoppm` (from Poppler) — `brew install poppler` on macOS
 - Python 3.10+
 - Node.js 18+
 
-## Quick Start
+### Ollama Backend
+- [Ollama](https://ollama.com/) installed and running
+- GLM-OCR model: `ollama pull glm-ocr`
 
-### 1. Start Ollama
+### MLX Backend (Apple Silicon)
+- Apple Silicon Mac (M series chip)
+- macOS 14.0 (Sonoma) or later
 
 ```bash
-ollama serve
-# In another terminal:
-ollama pull glm-ocr
+python3 -m venv .venv-mlx
+source .venv-mlx/bin/activate
+pip install git+https://github.com/Blaizzy/mlx-vlm.git
+mlx_vlm.server --trust-remote-code --port 8080
 ```
 
-### 2. Backend (FastAPI)
+## Quick Start
+
+### 1. Backend
 
 ```bash
 cd /path/to/project
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-uvicorn app:app --reload --host 0.0.0.0 --port 8000
+
+# For Ollama (default)
+OLLAMA_URL=http://localhost:11434 uvicorn main:app --reload --port 8000
+
+# For MLX
+OCR_BACKEND=mlx MLX_URL=http://localhost:8080 uvicorn main:app --reload --port 8000
 ```
 
-### 3. Frontend (React)
+### 2. Frontend
 
 ```bash
 cd frontend
@@ -44,29 +79,25 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173** — the Vite dev server proxies `/api` to the FastAPI backend on port 8000.
-
-## Environment Variables
-
-| Variable | Default | Description |
-|---|---|---|
-| `OLLAMA_URL` | `http://localhost:11434` | Ollama server URL |
-| `MODEL_NAME` | `glm-ocr` | Model to use for OCR |
+Open **http://localhost:5173**
 
 ## API Endpoints
 
 | Method | Path | Description |
-|---|---|---|
-| `GET` | `/api/health` | Check Ollama availability |
-| `POST` | `/api/upload` | Upload a PDF file |
+|--------|------|-------------|
+| `POST` | `/api/jobs` | Upload PDF for conversion |
 | `GET` | `/api/jobs` | List all jobs |
 | `GET` | `/api/jobs/{id}` | Get job status |
-| `GET` | `/api/result/{id}` | Get markdown result |
-| `DELETE` | `/api/jobs/{id}` | Delete a job |
+| `GET` | `/api/jobs/{id}/result` | Get markdown result |
+| `DELETE` | `/api/jobs/{id}` | Delete job |
+| `GET` | `/api/health` | Health check (active backend) |
+| `GET` | `/api/health/all` | Health check (all backends) |
+| `POST` | `/api/backend` | Switch backend |
+| `SSE` | `/mcp` | Model Context Protocol |
 
-## Docker
+## Tech Stack
 
-```bash
-chmod +x scripts/*.sh
-./scripts/run-local.sh
-```
+- **Backend**: FastAPI, Pydantic, httpx, MCP
+- **Frontend**: React 18, TypeScript, Vite, CSS
+- **OCR**: GLM-OCR via Ollama or MLX
+- **Design**: Notion-Ink Neo-Brutalist with Geist + JetBrains Mono

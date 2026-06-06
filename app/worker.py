@@ -42,15 +42,17 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ocr_client=N
             )
             text = await client.ocr_image(img_path)
             pages.append(f"## Page {page_num}\n\n{text}")
+
+            # Write partial result so live preview can read it
+            partial_md = "\n\n---\n\n".join(pages)
+            out_path = settings.result_dir / f"{job_id}.md"
+            out_path.write_text(partial_md, encoding="utf-8")
+
             await store.update(
                 job_id,
                 status_text=f"Page {page_num} of {total} extracted",
                 progress=int(((page_num + 0.5) / total) * 80) + 10,
             )
-
-        md = "\n\n---\n\n".join(pages)
-        out_path = settings.result_dir / f"{job_id}.md"
-        out_path.write_text(md, encoding="utf-8")
 
         await store.update(
             job_id,

@@ -1,6 +1,5 @@
 from fastapi import APIRouter
-from app.models.job import HealthResponse
-from app.dependencies import get_ocr_client
+from app.dependencies import get_ocr_client, get_ollama, get_mlx
 from app.config import settings, OcrBackend
 
 router = APIRouter()
@@ -8,6 +7,7 @@ router = APIRouter()
 
 @router.get("/health")
 async def health():
+    """Check health of the active OCR backend."""
     client = get_ocr_client()
     available = await client.health_check()
     loaded = await client.is_model_loaded()
@@ -16,6 +16,35 @@ async def health():
         "model": client.model,
         "model_loaded": loaded,
         "backend": settings.ocr_backend.value,
+    }
+
+
+@router.get("/health/all")
+async def health_all():
+    """Check health of all OCR backends independently."""
+    ollama = get_ollama()
+    mlx = get_mlx()
+
+    ollama_avail = await ollama.health_check()
+    ollama_loaded = await ollama.is_model_loaded() if ollama_avail else False
+
+    mlx_avail = await mlx.health_check()
+    mlx_loaded = await mlx.is_model_loaded() if mlx_avail else False
+
+    return {
+        "active": settings.ocr_backend.value,
+        "ollama": {
+            "available": ollama_avail,
+            "model_loaded": ollama_loaded,
+            "model": ollama.model,
+            "url": settings.ollama_url,
+        },
+        "mlx": {
+            "available": mlx_avail,
+            "model_loaded": mlx_loaded,
+            "model": mlx.model,
+            "url": settings.mlx_url,
+        },
     }
 
 
