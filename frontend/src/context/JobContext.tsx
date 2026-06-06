@@ -20,8 +20,21 @@ export function JobProvider({ children }: { children: React.ReactNode }) {
   const [previewJob, setPreviewJob] = useState<{ content: string; title: string } | null>(null);
   const intervalRef = useRef<number | null>(null);
 
+  // Load existing jobs on mount
+  useEffect(() => {
+    jobsApi.list().then((existing) => {
+      if (existing && existing.length > 0) {
+        setJobs(existing);
+      }
+    }).catch(() => {});
+  }, []);
+
   const addJob = useCallback((job: Job) => {
-    setJobs((prev) => [...prev, job]);
+    setJobs((prev) => {
+      // Avoid duplicates
+      if (prev.some((j) => j.id === job.id)) return prev;
+      return [...prev, job];
+    });
   }, []);
 
   const removeJob = useCallback(async (id: string) => {

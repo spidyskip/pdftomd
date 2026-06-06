@@ -28,10 +28,11 @@ env/
 .DS_Store
 Thumbs.db
 
-# Project
+# Project data (not committed)
 uploads/
 results/
 temp_images/
+data/
 
 # Frontend
 frontend/node_modules/
