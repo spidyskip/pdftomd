@@ -37,3 +37,4 @@ temp_images/
 frontend/node_modules/
 frontend/dist/
 frontend/.vite/
+.vite/
