@@ -19,24 +19,48 @@ class MlxClient:
         self.model = model or settings.mlx_model
 
     async def health_check(self) -> bool:
+        """Check if the mlx-vlm server is reachable."""
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
-                r = await client.get(f"{self.base_url}/chat/completions",
-                    headers={"Content-Type": "application/json"},
-                    content='{"model":"' + self.model + '","messages":[{"role":"user","content":[{"type":"text","text":"hi"}]}],"max_tokens":1}',
+                # Try a minimal POST to /chat/completions — mlx-vlm responds even to short requests
+                r = await client.post(
+                    f"{self.base_url}/chat/completions",
+                    json={
+                        "model": self.model,
+                        "messages": [{"role": "user", "content": [{"type": "text", "text": "hi"}]}],
+                        "max_tokens": 1,
+                    },
                     timeout=5.0,
                 )
-                # Even an error response means the server is up
-                return True
-        except httpx.ConnectError:
+                return r.status_code == 200
+        except (httpx.ConnectError, httpx.TimeoutException):
             return False
+        except Exception:
+            # Any other error (e.g., model not found) still means server is up
+            return True
+
+    async def is_model_loaded(self) -> bool:
+        """Check if the MLX model is loaded by making a minimal inference request."""
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                r = await client.post(
+                    f"{self.base_url}/chat/completions",
+                    json={
+                        "model": self.model,
+                        "messages": [{"role": "user", "content": [{"type": "text", "text": "hi"}]}],
+                        "max_tokens": 1,
+                    },
+                    timeout=10.0,
+                )
+                if r.status_code == 200:
+                    data = r.json()
+                    return "choices" in data and len(data["choices"]) > 0
+                return False
         except Exception:
             return False
 
-    async def is_model_loaded(self) -> bool:
-        return await self.health_check()
-
     async def ensure_model(self) -> bool:
+        """MLX model is loaded when the server starts — just verify it's responsive."""
         return await self.is_model_loaded()
 
     async def ocr_image(self, image_path: Path) -> str:
