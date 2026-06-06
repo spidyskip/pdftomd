@@ -10,16 +10,14 @@
 }
 
 .toast {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   border: 2px solid var(--border-strong);
   border-radius: var(--radius);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-family: var(--font);
+  font-size: 0.75rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   box-shadow: var(--shadow-md);
-  animation: toast-in 0.2s ease;
+  animation: toast-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .toast-success { background: var(--success-subtle); color: var(--success); }

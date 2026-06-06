@@ -14,24 +14,24 @@
 
   /* Border */
   --border: #D1D1D1;
-  --border-strong: #000000;
+  --border-strong: #1A1A1A;
 
   /* Text */
   --text: #1A1A1A;
   --text-secondary: #5C5C5C;
   --text-muted: #8A8A8A;
 
-  /* Accent — flat pastels */
+  /* Accent — desaturated, not neon */
   --accent: #2563EB;
   --accent-hover: #1D4ED8;
   --accent-subtle: #EFF4FF;
 
-  /* Semantic — flat pastels */
+  /* Semantic — flat pastels, desaturated */
   --success: #16A34A;
   --success-subtle: #F0FDF4;
   --error: #DC2626;
   --error-subtle: #FEF2F2;
-  --warning: #D97706;
+  --warning: #B45309;
   --warning-subtle: #FFFBEB;
 
   /* Spacing */
@@ -45,15 +45,14 @@
   /* Radius — sharp corners for neo-brutalism */
   --radius: 4px;
 
-  /* Type */
-  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-  --font-serif: 'Georgia', 'Playfair Display', serif;
+  /* Type — Geist for UI, JetBrains Mono for data */
+  --font: 'Geist', 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
 
-  /* Shadows — hard, no blur */
-  --shadow-sm: 3px 3px 0px #000;
-  --shadow-md: 4px 4px 0px #000;
-  --shadow-lg: 6px 6px 0px #000;
+  /* Shadows — hard, no blur, tinted to bg hue */
+  --shadow-sm: 3px 3px 0px #1A1A1A;
+  --shadow-md: 4px 4px 0px #1A1A1A;
+  --shadow-lg: 6px 6px 0px #1A1A1A;
 }
 
 body {

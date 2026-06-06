@@ -30,9 +30,9 @@
 }
 
 .preview-title {
-  font-family: var(--font-serif);
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-family: var(--font);
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -46,19 +46,17 @@
 }
 
 .btn {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-family: var(--font);
+  font-size: 0.75rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.35rem 0.7rem;
+  padding: 0.4rem 0.85rem;
   border: 2px solid var(--border-strong);
   border-radius: var(--radius);
   background: var(--bg-elevated);
   color: var(--text);
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn:hover {
@@ -68,7 +66,7 @@
 
 .btn:active {
   box-shadow: none;
-  transform: translate(0, 0);
+  transform: translate(0, 0) scale(0.98);
 }
 
 .btn-close {

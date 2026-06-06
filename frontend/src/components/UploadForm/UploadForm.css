@@ -1,29 +1,29 @@
 .dropzone {
-  border: 3px dashed var(--border-strong);
+  border: 2px dashed var(--border-strong);
   border-radius: var(--radius);
-  padding: var(--space-xl) var(--space-lg);
+  padding: var(--space-2xl) var(--space-xl);
   text-align: center;
   cursor: pointer;
   background: var(--bg-elevated);
-  box-shadow: var(--shadow-md);
-  transition: all 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dropzone:hover:not(.dropzone--disabled) {
   border-color: var(--accent);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
   transform: translate(-2px, -2px);
 }
 
 .dropzone--active {
   border-color: var(--accent);
   background: var(--accent-subtle);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
   transform: translate(-2px, -2px);
 }
 
 .dropzone--disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: default;
 }
 
