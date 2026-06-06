@@ -1,69 +1,39 @@
 .backend-toggle {
+  position: relative;
+}
+
+.backend-toggle-main {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
-}
-
-.backend-toggle-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.backend-toggle-options {
-  display: flex;
+  gap: var(--space-xs);
+  padding: 4px 8px;
   border: 2px solid var(--border-strong);
   border-radius: var(--radius);
-  overflow: hidden;
-}
-
-.backend-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--text-muted);
   background: var(--bg-elevated);
-  border: none;
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
   transition: all 0.15s ease;
-}
-
-.backend-toggle-btn:first-child {
-  border-right: 2px solid var(--border-strong);
-}
-
-.backend-toggle-btn:hover:not(:disabled) {
-  background: var(--bg-hover);
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--text);
 }
 
-.backend-toggle-btn--active {
-  background: var(--text);
-  color: var(--bg-elevated);
+.backend-toggle-main:hover {
+  box-shadow: var(--shadow-md);
+  transform: translate(-1px, -1px);
 }
 
-.backend-toggle-btn--active:hover:not(:disabled) {
-  background: var(--text);
-  color: var(--bg-elevated);
-  opacity: 0.85;
-}
-
-.backend-toggle-btn:disabled {
-  opacity: 0.5;
-  cursor: default;
+.backend-toggle-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .backend-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
-  transition: background 0.3s ease;
 }
 
 .backend-dot--online {
@@ -77,4 +47,78 @@
 
 .backend-dot--unknown {
   background: var(--text-muted);
+}
+
+.backend-toggle-arrow {
+  font-size: 0.5rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.backend-toggle-arrow--open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown panel */
+.backend-toggle-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 50;
+  min-width: 220px;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: panel-in 0.15s ease;
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.backend-toggle-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.1s ease;
+  text-align: left;
+}
+
+.backend-toggle-option:hover {
+  background: var(--bg-hover);
+}
+
+.backend-toggle-option--active {
+  background: var(--bg-subtle);
+}
+
+.backend-toggle-option-left {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.backend-toggle-option-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.backend-toggle-hint {
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
 }

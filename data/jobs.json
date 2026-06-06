@@ -1,0 +1,12 @@
+[
+  {
+    "id": "39fdd5d1",
+    "filename": "Fundamentals of Data Engineering (Reis, JoeHousley, Matt) (Z-Library) (trascinato).pdf",
+    "status": "failed",
+    "progress": 90,
+    "status_text": "Extracting text from page 1 of 1",
+    "page_count": 1,
+    "error": "MLX server returned 500: {\"detail\":\"Generation failed: RuntimeError: TypeError: __radd__(): incompatible function arguments. The following argument types are supported:\\n    1. __radd__(self, other: bool | int | float | mlx.c",
+    "created": "2026-06-06T23:31:28.159100+00:00"
+  }
+]

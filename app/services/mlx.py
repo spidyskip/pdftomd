@@ -93,6 +93,16 @@ class MlxClient:
                     f"{self.base_url}/chat/completions",
                     json=payload,
                 )
+                if r.status_code == 500:
+                    detail = r.text[:300]
+                    if "TypeError" in detail or "RuntimeError" in detail:
+                        raise MlxError(
+                            f"MLX server error (image processing failed). "
+                            f"If using MLX Studio, try the direct mlx-vlm server on port 8081: "
+                            f"mlx_vlm.server --trust-remote-code --port 8081. "
+                            f"Detail: {detail}"
+                        )
+                    raise MlxError(f"MLX server returned 500: {detail}")
                 if r.status_code != 200:
                     raise MlxError(f"MLX server returned {r.status_code}: {r.text[:200]}")
                 data = r.json()

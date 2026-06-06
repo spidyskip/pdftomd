@@ -4,13 +4,12 @@ Exposes tools for AI agents to upload PDFs, check status, and retrieve results.
 """
 
 from mcp.server.fastmcp import FastMCP
-from app.dependencies import get_store, get_ollama
+from app.dependencies import get_store, get_ocr_client
 from app.models.job import JobResponse, JobStatus
 from app.worker import process_job
-from app.config import settings
+from app.config import settings, OcrBackend
 from pathlib import Path
 import uuid
-import tempfile
 
 mcp = FastMCP("pdf-to-markdown")
 
@@ -50,12 +49,12 @@ async def upload_pdf(file_path: str) -> str:
     store = get_store()
     await store.create(job)
 
-    # Start processing in background
-    ollama = get_ollama()
+    # Start processing in background using the active OCR backend
+    client = get_ocr_client()
     import asyncio
-    asyncio.create_task(process_job(job_id, save_path, store, ollama))
+    asyncio.create_task(process_job(job_id, save_path, store, client))
 
-    return f'{{"job_id": "{job_id}", "status": "queued", "filename": "{path.name}"}}'
+    return f'{{"job_id": "{job_id}", "status": "queued", "filename": "{path.name}", "backend": "{settings.ocr_backend.value}"}}'
 
 
 @mcp.tool()
@@ -146,13 +145,35 @@ async def delete_job(job_id: str) -> str:
 
 
 @mcp.tool()
-async def ollama_health() -> str:
-    """Check Ollama connectivity and model status.
+async def check_health() -> str:
+    """Check health of the active OCR backend.
 
     Returns:
-        JSON with ollama_available, model name, and model_loaded status.
+        JSON with availability, model name, and model_loaded status.
     """
-    ollama = get_ollama()
-    available = await ollama.health_check()
-    loaded = await ollama.is_model_loaded() if available else False
-    return f'{{"ollama_available": {str(available).lower()}, "model": "{ollama.model}", "model_loaded": {str(loaded).lower()}}}'
+    client = get_ocr_client()
+    available = await client.health_check()
+    loaded = await client.is_model_loaded() if available else False
+    return f'{{"available": {str(available).lower()}, "model": "{client.model}", "model_loaded": {str(loaded).lower()}, "backend": "{settings.ocr_backend.value}"}}'
+
+
+@mcp.tool()
+async def switch_engine(backend: str) -> str:
+    """Switch the OCR backend engine.
+
+    Args:
+        backend: The backend to switch to — "ollama" or "mlx".
+
+    Returns:
+        JSON with the new backend and status.
+    """
+    try:
+        new_backend = OcrBackend(backend)
+    except ValueError:
+        return f'{{"error": "Invalid backend: {backend}. Use \'ollama\' or \'mlx\'."}}'
+
+    settings.ocr_backend = new_backend
+    client = get_ocr_client()
+    available = await client.health_check()
+    loaded = await client.is_model_loaded() if available else False
+    return f'{{"backend": "{settings.ocr_backend.value}", "model": "{client.model}", "available": {str(available).lower()}, "model_loaded": {str(loaded).lower()}}}'

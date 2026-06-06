@@ -1,9 +1,9 @@
 from app.config import settings, OcrBackend
-from app.services.storage import InMemoryJobStore, JobStore
+from app.services.storage import FileJobStore, JobStore
 from app.services.ollama import OllamaClient
 from app.services.mlx import MlxClient
 
-_store: JobStore = InMemoryJobStore()
+_store: JobStore = FileJobStore()
 _ollama: OllamaClient = OllamaClient()
 _mlx: MlxClient = MlxClient()
 

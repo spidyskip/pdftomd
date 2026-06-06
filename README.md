@@ -51,7 +51,11 @@ Convert PDF documents to structured Markdown using **GLM-OCR**. Supports both **
 python3 -m venv .venv-mlx
 source .venv-mlx/bin/activate
 pip install git+https://github.com/Blaizzy/mlx-vlm.git
+
+# Start MLX server (default port 8080)
 mlx_vlm.server --trust-remote-code --port 8080
+
+# Or use MLX Studio which runs on port 8080
 ```
 
 ## Quick Start
