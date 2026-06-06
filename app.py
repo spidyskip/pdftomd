@@ -1,8 +1,6 @@
-"""
-FastAPI backend for PDF to Markdown OCR using GLM-OCR via Ollama.
-"""
+from app.main import create_app
 
-import os
+app = create_app()
 import re
 import uuid
 import base64
