@@ -5,33 +5,34 @@
 }
 
 :root {
-  /* Surface */
-  --bg: #ffffff;
-  --bg-subtle: #f7f7f8;
-  --bg-hover: #efefef;
-  --bg-active: #e8e8ec;
+  /* Surface — warm off-white like Notion */
+  --bg: #F7F6F3;
+  --bg-subtle: #FBF9F5;
+  --bg-hover: #EDEBE7;
+  --bg-active: #E0DDD9;
+  --bg-elevated: #FFFFFF;
 
   /* Border */
-  --border: #e0e0e4;
-  --border-strong: #c8c8d0;
+  --border: #D1D1D1;
+  --border-strong: #000000;
 
   /* Text */
-  --text: #1a1a24;
-  --text-secondary: #5c5c6e;
-  --text-muted: #8a8a9e;
+  --text: #1A1A1A;
+  --text-secondary: #5C5C5C;
+  --text-muted: #8A8A8A;
 
-  /* Accent — restrained, used only for primary actions */
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-subtle: #eff4ff;
+  /* Accent — flat pastels */
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
+  --accent-subtle: #EFF4FF;
 
-  /* Semantic */
-  --success: #16a34a;
-  --success-subtle: #f0fdf4;
-  --error: #dc2626;
-  --error-subtle: #fef2f2;
-  --warning: #d97706;
-  --warning-subtle: #fffbeb;
+  /* Semantic — flat pastels */
+  --success: #16A34A;
+  --success-subtle: #F0FDF4;
+  --error: #DC2626;
+  --error-subtle: #FEF2F2;
+  --warning: #D97706;
+  --warning-subtle: #FFFBEB;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -41,12 +42,18 @@
   --space-xl: 2rem;
   --space-2xl: 3rem;
 
-  /* Radius */
-  --radius: 6px;
+  /* Radius — sharp corners for neo-brutalism */
+  --radius: 4px;
 
   /* Type */
-  --font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  --font: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  --font-serif: 'Georgia', 'Playfair Display', serif;
+
+  /* Shadows — hard, no blur */
+  --shadow-sm: 3px 3px 0px #000;
+  --shadow-md: 4px 4px 0px #000;
+  --shadow-lg: 6px 6px 0px #000;
 }
 
 body {
@@ -61,7 +68,6 @@ body {
 
 #root {
   min-height: 100vh;
-  border-top: 2px solid var(--accent);
 }
 
 ::selection {

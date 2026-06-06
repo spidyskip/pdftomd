@@ -1,7 +1,7 @@
 .preview-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,15 +9,15 @@
 }
 
 .preview {
-  background: var(--bg);
-  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  border: 3px solid var(--border-strong);
   border-radius: var(--radius);
   width: 92%;
   max-width: 720px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-lg);
 }
 
 .preview-header {
@@ -25,13 +25,14 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--space-md) var(--space-lg);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 3px solid var(--border-strong);
   flex-shrink: 0;
 }
 
 .preview-title {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  font-weight: 700;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -45,21 +46,29 @@
 }
 
 .btn {
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   padding: 0.35rem 0.7rem;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius);
-  background: var(--bg);
-  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  color: var(--text);
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
 }
 
 .btn:hover {
-  border-color: var(--border-strong);
-  color: var(--text);
+  box-shadow: var(--shadow-md);
+  transform: translate(-1px, -1px);
+}
+
+.btn:active {
+  box-shadow: none;
+  transform: translate(0, 0);
 }
 
 .btn-close {
@@ -68,7 +77,7 @@
 
 .btn-close:hover {
   color: var(--text);
-  border-color: var(--border-strong);
+  background: var(--bg-hover);
 }
 
 .preview-body {
@@ -78,6 +87,8 @@
   font-size: 0.875rem;
   line-height: 1.7;
   color: var(--text);
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 .preview-body h1,
@@ -85,7 +96,7 @@
 .preview-body h3 {
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .preview-body h1 { font-size: 1.25rem; }

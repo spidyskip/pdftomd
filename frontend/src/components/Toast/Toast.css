@@ -11,10 +11,14 @@
 
 .toast {
   padding: 0.5rem 1rem;
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius);
-  font-size: 0.8rem;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-md);
   animation: toast-in 0.2s ease;
 }
 

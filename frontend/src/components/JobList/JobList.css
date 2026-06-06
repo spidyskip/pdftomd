@@ -1,40 +1,49 @@
 .jobs-empty {
-  padding: var(--space-xl) 0;
+  padding: var(--space-xl);
   text-align: center;
+  border: 3px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-md);
 }
 
 .jobs-empty p {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
   margin-bottom: var(--space-xs);
 }
 
 .jobs-empty span {
-  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
 }
 
 .jobs-list {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
+  gap: var(--space-md);
 }
 
 .job-row {
   padding: var(--space-md) var(--space-lg);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.1s ease;
+  border: 3px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-md);
+  transition: all 0.15s ease;
 }
 
 .job-row:hover {
-  background: var(--bg-subtle);
+  box-shadow: var(--shadow-lg);
+  transform: translate(-2px, -2px);
 }
 
 .job-row:last-child {
-  border-bottom: none;
+  border-bottom: 3px solid var(--border-strong);
 }
 
 .job-row-main {
@@ -46,7 +55,7 @@
 
 .job-name {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
@@ -61,7 +70,10 @@
 }
 
 .job-pages {
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
 }
 
@@ -69,17 +81,21 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: currentColor;
   flex-shrink: 0;
+  border: 2px solid rgba(0,0,0,0.1);
 }
 
 .job-progress {
@@ -91,21 +107,25 @@
 
 .progress-track {
   flex: 1;
-  height: 4px;
+  height: 6px;
   background: var(--bg-active);
+  border: 2px solid var(--border-strong);
   border-radius: 2px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: var(--accent);
-  border-radius: 2px;
+  background: var(--text);
+  border-radius: 1px;
   transition: width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 .progress-text {
-  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
   white-space: nowrap;
   min-width: 100px;
@@ -114,41 +134,52 @@
 
 .job-error {
   margin-top: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
   font-size: 0.8rem;
   color: var(--error);
+  background: var(--error-subtle);
+  border: 2px solid var(--error);
+  border-radius: var(--radius);
 }
 
 .job-actions {
   display: flex;
   gap: var(--space-sm);
-  margin-top: var(--space-sm);
+  margin-top: var(--space-md);
 }
 
 .job-btn {
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.3rem 0.65rem;
-  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 0.75rem;
+  border: 2px solid var(--border-strong);
   border-radius: var(--radius);
-  background: var(--bg);
-  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  color: var(--text);
   cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
 }
 
 .job-btn:hover {
-  border-color: var(--border-strong);
-  color: var(--text);
+  box-shadow: var(--shadow-md);
+  transform: translate(-1px, -1px);
+}
+
+.job-btn:active {
+  box-shadow: none;
+  transform: translate(0, 0);
 }
 
 .job-btn-danger {
   color: var(--error);
-  border-color: transparent;
 }
 
 .job-btn-danger:hover {
-  border-color: var(--error);
+  background: var(--error-subtle);
 }
 
 @media (max-width: 640px) {

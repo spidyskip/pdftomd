@@ -1,24 +1,29 @@
 .dropzone {
-  border: 1px dashed var(--border-strong);
+  border: 3px dashed var(--border-strong);
   border-radius: var(--radius);
   padding: var(--space-xl) var(--space-lg);
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-md);
+  transition: all 0.15s ease;
 }
 
 .dropzone:hover:not(.dropzone--disabled) {
   border-color: var(--accent);
-  background: var(--accent-subtle);
+  box-shadow: var(--shadow-lg);
+  transform: translate(-2px, -2px);
 }
 
 .dropzone--active {
   border-color: var(--accent);
   background: var(--accent-subtle);
+  box-shadow: var(--shadow-lg);
+  transform: translate(-2px, -2px);
 }
 
 .dropzone--disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: default;
 }
 
@@ -40,12 +45,15 @@
 
 .dropzone-label {
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text);
 }
 
 .dropzone-hint {
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
 }
 
@@ -57,16 +65,22 @@
 }
 
 .dropzone-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--border);
+  border-top-color: var(--text);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .dropzone {
+    padding: var(--space-lg) var(--space-md);
+  }
 }
 
 @media (max-width: 640px) {
