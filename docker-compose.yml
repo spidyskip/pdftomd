@@ -20,6 +20,7 @@ services:
     ports:
       - "8000:8000"
     environment:
+      OCR_BACKEND: ollama
       OLLAMA_URL: http://ollama:11434
       AUTO_PULL_MODEL: "true"
       UPLOAD_DIR: /app/uploads
@@ -27,6 +28,7 @@ services:
     volumes:
       - uploads:/app/uploads
       - results:/app/results
+      - data:/app/data
     depends_on:
       ollama:
         condition: service_healthy
@@ -34,7 +36,6 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
     container_name: pdfmd-frontend
     ports:
       - "5173:5173"
@@ -47,3 +48,4 @@ volumes:
   ollama-data:
   uploads:
   results:
+  data:
