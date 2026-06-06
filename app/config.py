@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     auto_pull_model: bool = True
 
     # MLX settings
-    mlx_url: str = "http://localhost:8080"
+    mlx_url: str = "http://localhost:8081"
     mlx_model: str = "mlx-community/GLM-OCR-bf16"
 
     # General
