@@ -30,13 +30,19 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ollama: Olla
 
         pages = []
         for i, img_path in enumerate(images):
+            page_num = i + 1
             await store.update(
                 job_id,
-                status_text=f"OCR page {i + 1}/{total}",
-                progress=int((i + 1) / total * 100),
+                status_text=f"Extracting text from page {page_num} of {total}",
+                progress=int((page_num / total) * 80) + 10,
             )
             text = await asyncio.to_thread(ollama.ocr_image, img_path)
-            pages.append(f"## Page {i + 1}\n\n{text}")
+            pages.append(f"## Page {page_num}\n\n{text}")
+            await store.update(
+                job_id,
+                status_text=f"Page {page_num} of {total} extracted",
+                progress=int(((page_num + 0.5) / total) * 80) + 10,
+            )
 
         md = "\n\n---\n\n".join(pages)
         out_path = settings.result_dir / f"{job_id}.md"

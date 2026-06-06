@@ -316,6 +316,17 @@
   background: var(--error-subtle);
 }
 
+.btn-live {
+  background: var(--text);
+  color: var(--bg-elevated);
+}
+
+.btn-live:hover {
+  background: var(--text);
+  color: var(--bg-elevated);
+  opacity: 0.85;
+}
+
 @media (max-width: 640px) {
   .job-row {
     padding: var(--space-md);

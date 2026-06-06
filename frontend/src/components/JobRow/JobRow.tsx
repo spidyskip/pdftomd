@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Job } from "../../types/job";
 import { useJobs } from "../../context/JobContext";
 import { jobsApi } from "../../api/client";
 import { showToast } from "../Toast/Toast";
 import { statusConfig } from "../JobList/JobList";
+import LivePreview from "../LivePreview/LivePreview";
 
 interface Props { job: Job }
 
@@ -25,6 +27,7 @@ function getActiveStep(statusText: string): number {
 
 export default function JobRow({ job }: Props) {
   const { removeJob, showPreview } = useJobs();
+  const [showLivePreview, setShowLivePreview] = useState(false);
   const isProcessing = job.status === "processing";
   const activeStep = getActiveStep(job.status_text);
 
@@ -125,6 +128,15 @@ export default function JobRow({ job }: Props) {
       )}
 
       <div className="job-actions">
+        {isProcessing && (
+          <button className="job-btn btn-live" onClick={() => setShowLivePreview(true)}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            Live Preview
+          </button>
+        )}
         {job.status === "finished" && (
           <>
             <button className="job-btn" onClick={handleView}>
@@ -153,6 +165,10 @@ export default function JobRow({ job }: Props) {
           Remove
         </button>
       </div>
+
+      {showLivePreview && (
+        <LivePreview job={job} onClose={() => setShowLivePreview(false)} />
+      )}
     </div>
   );
 }
