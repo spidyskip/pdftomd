@@ -18,6 +18,9 @@ env/
 # IDE
 .vscode/
 .idea/
+
+# Superpowers brainstorming
+.superpowers/
 *.swp
 *.swo
 
