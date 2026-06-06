@@ -37,7 +37,7 @@ class OllamaClient:
             r = requests.post(
                 f"{self.base_url}/api/pull",
                 json={"name": self.model, "stream": False},
-                timeout=300,
+                timeout=600,
             )
             return r.status_code == 200
         except Exception as e:
@@ -54,7 +54,21 @@ class OllamaClient:
             "images": [b64],
             "stream": False,
         }
-        r = requests.post(f"{self.base_url}/api/generate", json=payload, timeout=120)
-        if r.status_code != 200:
-            raise OllamaError(f"Ollama error {r.status_code}: {r.text}")
-        return r.json().get("response", "").strip()
+        try:
+            r = requests.post(
+                f"{self.base_url}/api/generate",
+                json=payload,
+                timeout=300,
+            )
+            if r.status_code != 200:
+                raise OllamaError(f"Ollama returned {r.status_code}: {r.text[:200]}")
+            return r.json().get("response", "").strip()
+        except requests.Timeout:
+            raise OllamaError(
+                "Ollama timed out after 300s. "
+                "The model may be too large for your hardware."
+            )
+        except requests.ConnectionError:
+            raise OllamaError(
+                "Cannot connect to Ollama. Make sure Ollama is running."
+            )

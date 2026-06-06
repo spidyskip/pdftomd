@@ -38,9 +38,9 @@
   transform: translate(-2px, -2px);
 }
 
-.job-row:active {
-  box-shadow: none;
-  transform: translate(0, 0);
+.job-row--processing {
+  border-color: var(--text);
+  box-shadow: var(--shadow-md);
 }
 
 .job-row-main {
@@ -48,6 +48,13 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--space-md);
+}
+
+.job-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .job-name {
@@ -59,6 +66,11 @@
   text-overflow: ellipsis;
 }
 
+.job-pages {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
 .job-meta {
   display: flex;
   align-items: center;
@@ -66,23 +78,12 @@
   flex-shrink: 0;
 }
 
-.job-pages {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-}
-
 .job-status {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
@@ -94,14 +95,118 @@
   flex-shrink: 0;
 }
 
+/* ---- Progress section ---- */
+
 .job-progress {
+  margin-top: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.progress-steps {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1;
+  position: relative;
+}
+
+.step-indicator {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.progress-step.step-done .step-indicator {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg-elevated);
+}
+
+.progress-step.step-active .step-indicator {
+  border-color: var(--text);
+  color: var(--text);
+  box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
+}
+
+.progress-step.step-pending .step-indicator {
+  background: var(--bg-subtle);
+}
+
+.step-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.step-number {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.step-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+
+.progress-step.step-active .step-label {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.progress-step.step-done .step-label {
+  color: var(--text-secondary);
+}
+
+.step-connector {
+  position: absolute;
+  top: 14px;
+  left: calc(50% + 14px);
+  right: calc(-50% + 14px);
+  height: 2px;
+  background: var(--border);
+  z-index: -1;
+}
+
+.progress-step.step-done .step-connector {
+  background: var(--text);
+}
+
+.progress-bar {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  margin-top: var(--space-sm);
 }
 
-.progress-track {
+.progress-bar .progress-track {
   flex: 1;
   height: 4px;
   background: var(--bg-active);
@@ -109,33 +214,66 @@
   overflow: hidden;
 }
 
-.progress-fill {
+.progress-bar .progress-fill {
   height: 100%;
   background: var(--text);
   border-radius: 2px;
   transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.progress-text {
+.progress-pct {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
-  white-space: nowrap;
-  min-width: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 36px;
   text-align: right;
 }
+
+.progress-status {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ---- Error state ---- */
 
 .job-error {
   margin-top: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  font-size: 0.8rem;
-  color: var(--error);
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
   background: var(--error-subtle);
   border: 2px solid var(--error);
   border-radius: var(--radius);
 }
+
+.job-error-icon {
+  color: var(--error);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.job-error-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.job-error-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--error);
+}
+
+.job-error-text {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  word-break: break-word;
+}
+
+/* ---- Actions ---- */
 
 .job-actions {
   display: flex;
@@ -155,6 +293,9 @@
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
 }
 
 .job-btn:hover {
@@ -194,8 +335,18 @@
     flex-wrap: wrap;
   }
 
-  .progress-text {
-    min-width: 80px;
-    font-size: 0.65rem;
+  .step-label {
+    font-size: 0.6rem;
+  }
+
+  .step-indicator {
+    width: 24px;
+    height: 24px;
+  }
+
+  .step-connector {
+    top: 12px;
+    left: calc(50% + 12px);
+    right: calc(-50% + 12px);
   }
 }
