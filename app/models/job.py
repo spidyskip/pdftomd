@@ -20,6 +20,7 @@ class JobResponse(BaseModel):
     page_count: Optional[int] = None
     error: Optional[str] = None
     created: str
+    engine: Optional[str] = None
 
 class HealthResponse(BaseModel):
     ollama_available: bool

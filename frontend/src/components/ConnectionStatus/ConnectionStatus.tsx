@@ -6,6 +6,7 @@ interface HealthData {
   available: boolean;
   model: string;
   model_loaded: boolean;
+  ocr_available?: boolean;
   backend: string;
 }
 
@@ -37,14 +38,43 @@ export default function ConnectionStatus() {
     ? "Markitdown"
     : "Ollama";
 
+  const markitdownOcrAvailable = health?.ocr_available === true;
+
+  const modelLabel = backendLabel === "Markitdown"
+    ? markitdownOcrAvailable ? "with OCR" : "basic (no ocr)"
+    : (isConnected || isPartial) && health?.model && health.model !== "unknown"
+    ? health.model
+    : "";
+
+  const infoMessage = backendLabel === "Markitdown"
+    ? isConnected
+      ? markitdownOcrAvailable
+        ? "Markitdown with OCR is active. It can convert and extract text from scanned PDFs."
+        : "Markitdown is active but OCR is not available. Install the markitdown-ocr package to enable OCR for scanned PDFs."
+      : isPartial
+      ? "Markitdown is reachable but OCR support (markitdown-ocr) is not installed."
+      : "Markitdown is installed without OCR support. Install the markitdown-ocr package to enable OCR."
+    : !checking && !isConnected
+    ? backendLabel === "MLX"
+      ? "MLX is not reachable. Ensure the MLX server is running and the configured model is available."
+      : "Ollama is not reachable. Make sure Ollama is running and the selected model is loaded."
+    : isPartial
+    ? `${backendLabel} is reachable but the model is not loaded yet.`
+    : "";
+
   return (
     <div className={`conn-status ${checking ? "conn-status--checking" : ""} ${isConnected ? "conn-status--connected" : ""} ${isPartial ? "conn-status--partial" : ""} ${!checking && !isConnected && !isPartial ? "conn-status--error" : ""}`}>
-      <div className="conn-dot" />
       <span className="conn-label">
-        {checking ? "Checking…" : isConnected ? `${backendLabel} connected` : isPartial ? `${backendLabel} model not loaded` : `${backendLabel} offline`}
+        {checking ? "Checking…" : isConnected ? backendLabel : isPartial ? backendLabel : backendLabel === "Markitdown" ? "Markitdown" : "OCR disabled"}
       </span>
-      {health && isConnected && (
-        <span className="conn-model">{health.model}</span>
+      {modelLabel && (
+        <span className="conn-model">{modelLabel}</span>
+      )}
+      {infoMessage && (
+        <span className="conn-tooltip-wrapper" aria-label={infoMessage}>
+          <span className="conn-tooltip-icon">?</span>
+          <span className="conn-tooltip">{infoMessage}</span>
+        </span>
       )}
     </div>
   );

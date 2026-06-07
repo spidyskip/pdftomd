@@ -67,10 +67,15 @@ export default function JobRow({ job }: Props) {
             <span className="job-pages">{job.page_count} {job.page_count === 1 ? "page" : "pages"}</span>
           )}
         </div>
-        <span className="job-status" style={{ color: cfg.color }}>
-          <span className="status-dot" />
-          {cfg.label}
-        </span>
+        <div className="job-meta">
+          {job.engine && (
+            <span className="job-engine">{job.engine}</span>
+          )}
+          <span className="job-status" style={{ color: cfg.color }}>
+            <span className="status-dot" />
+            {cfg.label}
+          </span>
+        </div>
       </div>
 
       {isProcessing && (

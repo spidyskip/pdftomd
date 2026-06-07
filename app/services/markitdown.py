@@ -32,6 +32,13 @@ class MarkitdownClient:
             self._module = False
             return self._module
 
+    def _ocr_plugin_available(self) -> bool:
+        try:
+            spec = importlib.util.find_spec("markitdown_ocr")
+            return spec is not None
+        except Exception:
+            return False
+
     def _cli_available(self) -> bool:
         return shutil.which(self.cli_path) is not None
 
@@ -56,6 +63,9 @@ class MarkitdownClient:
 
     async def is_model_loaded(self) -> bool:
         return await self.health_check()
+
+    def has_ocr(self) -> bool:
+        return self._ocr_plugin_available()
 
     async def ensure_model(self) -> bool:
         return await self.health_check()

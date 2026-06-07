@@ -21,7 +21,7 @@ function App() {
                 <ConnectionStatus />
               </div>
             </div>
-            <p>Convert PDF documents to structured Markdown using GLM-OCR</p>
+            <p>Convert PDF documents to structured Markdown using AI-powered OCR engines (Ollama, MLX) or Markitdown for native PDF conversion.</p>
           </header>
           <main className="app-main">
             <UploadForm />

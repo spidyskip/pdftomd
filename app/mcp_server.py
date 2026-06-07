@@ -154,7 +154,8 @@ async def check_health() -> str:
     client = get_ocr_client()
     available = await client.health_check()
     loaded = await client.is_model_loaded() if available else False
-    return f'{{"available": {str(available).lower()}, "model": "{client.model}", "model_loaded": {str(loaded).lower()}, "backend": "{settings.ocr_backend.value}"}}'
+    model_name = getattr(client, "model", None) or getattr(client, "cli_path", "unknown")
+    return f'{{"available": {str(available).lower()}, "model": "{model_name}", "model_loaded": {str(loaded).lower()}, "backend": "{settings.ocr_backend.value}"}}'
 
 
 @mcp.tool()
@@ -162,7 +163,7 @@ async def switch_engine(backend: str) -> str:
     """Switch the OCR backend engine.
 
     Args:
-        backend: The backend to switch to — "ollama" or "mlx".
+        backend: The backend to switch to — "ollama", "mlx", or "markitdown".
 
     Returns:
         JSON with the new backend and status.
@@ -170,10 +171,11 @@ async def switch_engine(backend: str) -> str:
     try:
         new_backend = OcrBackend(backend)
     except ValueError:
-        return f'{{"error": "Invalid backend: {backend}. Use \'ollama\' or \'mlx\'."}}'
+        return f'{{"error": "Invalid backend: {backend}. Use \'ollama\', \'mlx\', or \'markitdown\'."}}'
 
     settings.ocr_backend = new_backend
     client = get_ocr_client()
     available = await client.health_check()
     loaded = await client.is_model_loaded() if available else False
-    return f'{{"backend": "{settings.ocr_backend.value}", "model": "{client.model}", "available": {str(available).lower()}, "model_loaded": {str(loaded).lower()}}}'
+    model_name = getattr(client, "model", None) or getattr(client, "cli_path", "unknown")
+    return f'{{"backend": "{settings.ocr_backend.value}", "model": "{model_name}", "available": {str(available).lower()}, "model_loaded": {str(loaded).lower()}}}'

@@ -27,6 +27,16 @@ async def upload(
     save_path = settings.upload_dir / f"{job_id}_{file.filename}"
     save_path.write_bytes(contents)
 
+    from app.config import OcrBackend
+
+    backend_label = (
+        "Markitdown"
+        if settings.ocr_backend == OcrBackend.MARKITDOWN
+        else "MLX"
+        if settings.ocr_backend == OcrBackend.MLX
+        else "Ollama"
+    )
+
     job = JobResponse(
         id=job_id,
         filename=file.filename,
@@ -36,6 +46,7 @@ async def upload(
         page_count=None,
         error=None,
         created=datetime.now(timezone.utc).isoformat(),
+        engine=backend_label,
     )
 
     store = get_store()

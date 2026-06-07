@@ -11,10 +11,12 @@ async def health():
     client = get_ocr_client()
     available = await client.health_check()
     loaded = await client.is_model_loaded()
+    ocr_available = client.has_ocr() if hasattr(client, "has_ocr") else loaded
     return {
         "available": available,
         "model": getattr(client, "model", None) or getattr(client, "cli_path", None),
         "model_loaded": loaded,
+        "ocr_available": ocr_available,
         "backend": settings.ocr_backend.value,
     }
 
@@ -34,6 +36,7 @@ async def health_all():
     markitdown = get_markitdown()
     markitdown_avail = await markitdown.health_check()
     markitdown_loaded = await markitdown.is_model_loaded() if markitdown_avail else False
+    markitdown_ocr = markitdown.has_ocr() if markitdown_avail else False
 
     return {
         "active": settings.ocr_backend.value,
@@ -52,6 +55,7 @@ async def health_all():
         "markitdown": {
             "available": markitdown_avail,
             "model_loaded": markitdown_loaded,
+            "ocr_available": markitdown_ocr,
             "path": settings.markitdown_cli,
         },
     }

@@ -21,7 +21,7 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ocr_client=N
     else:
         backend_label = "Ollama"
 
-    await store.update(job_id, status=JobStatus.PROCESSING, progress=0)
+    await store.update(job_id, status=JobStatus.PROCESSING, progress=0, engine=backend_label)
 
     try:
         await store.update(job_id, status_text=f"Checking {backend_label}…")

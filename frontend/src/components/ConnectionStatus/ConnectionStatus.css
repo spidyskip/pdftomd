@@ -10,12 +10,69 @@
 }
 
 .conn-dot {
-  width: 8px;
-  height: 8px;
+  display: none;
+}
+
+.conn-text {
+  display: none;
+}
+
+.conn-label-row {
+  display: none;
+}
+
+.conn-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: var(--text-muted);
-  flex-shrink: 0;
-  transition: background 0.3s ease;
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: help;
+}
+
+.conn-tooltip-icon {
+  line-height: 1;
+}
+
+.conn-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 220px;
+  max-width: 300px;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.65rem;
+  line-height: 1.3;
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.conn-tooltip-wrapper:hover .conn-tooltip,
+.conn-tooltip-wrapper:focus-within .conn-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.conn-model {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  padding-left: var(--space-xs);
+  border-left: 1px solid var(--border);
 }
 
 .conn-status--connected .conn-dot {
