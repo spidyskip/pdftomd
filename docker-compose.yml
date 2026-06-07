@@ -7,9 +7,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      OCR_BACKEND: ${OCR_BACKEND:-ollama}
+      OCR_BACKEND: ${OCR_BACKEND:-markitdown}
       OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
-      MLX_URL: ${MLX_URL:-http://localhost:8080}
+      MLX_URL: ${MLX_URL:-http://${HOST_IP:-host.docker.internal}:8080}
+      MARKITDOWN_CLI: markitdown
       AUTO_PULL_MODEL: "true"
       UPLOAD_DIR: /app/uploads
       RESULT_DIR: /app/results
@@ -25,11 +26,10 @@ services:
   frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
     container_name: pdfmd-frontend
     ports:
       - "5173:5173"
-    environment:
-      VITE_API_URL: http://localhost:8000
     depends_on:
       - backend
 

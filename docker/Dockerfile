@@ -4,6 +4,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     poppler-utils curl && \
     rm -rf /var/lib/apt/lists/*
 
+# Install markitdown CLI globally so the binary is on PATH
+RUN pip install --no-cache-dir markitdown[pdf]>=0.1
+
 WORKDIR /app
 
 COPY requirements.txt .

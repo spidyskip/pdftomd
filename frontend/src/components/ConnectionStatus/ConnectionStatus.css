@@ -75,14 +75,38 @@
   border-left: 1px solid var(--border);
 }
 
+.conn-status--connected {
+  border-color: var(--success);
+}
+
+.conn-status--connected .conn-label {
+  color: var(--success);
+}
+
 .conn-status--connected .conn-dot {
   background: var(--success);
   box-shadow: 0 0 6px rgba(22, 163, 74, 0.4);
 }
 
+.conn-status--partial {
+  border-color: var(--warning);
+}
+
+.conn-status--partial .conn-label {
+  color: var(--warning);
+}
+
 .conn-status--partial .conn-dot {
   background: var(--warning);
   animation: pulse 1.5s ease-in-out infinite;
+}
+
+.conn-status--error {
+  border-color: var(--error);
+}
+
+.conn-status--error .conn-label {
+  color: var(--error);
 }
 
 .conn-status--error .conn-dot {
