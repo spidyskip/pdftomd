@@ -179,7 +179,7 @@ docker compose down && docker compose up -d --build
 
 **For MLX with Docker**, create a `.env` file:
 ```env
-HOST_IP=YOUR_HOST_IP
+HOST_IP=your.host.ip.here
 ```
 Find your IP: `ifconfig | grep "inet " | grep -v 127.0.0.1`
 

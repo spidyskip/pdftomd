@@ -65,4 +65,4 @@ docker compose down && docker compose up -d --build
 | `OCR_BACKEND` | `markitdown` | Default OCR engine: `ollama`, `mlx`, or `markitdown` |
 | `MLX_URL` | `http://host.docker.internal:8080` | MLX server URL |
 | `OLLAMA_URL` | `http://ollama:11434` | Ollama server URL |
-| `HOST_IP` | `YOUR_HOST_IP` | Host IP for container-to-host connectivity |
+| `HOST_IP` | `your.host.ip.here` | Host IP for container-to-host connectivity |
