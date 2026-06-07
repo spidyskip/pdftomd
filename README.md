@@ -1,6 +1,7 @@
 # PDF to Markdown OCR
 
 [![CI](https://github.com/spidyskip/pdftomd/actions/workflows/ci.yml/badge.svg)](https://github.com/spidyskip/pdftomd/actions/workflows/ci.yml)
+[![Docker](https://github.com/spidyskip/pdftomd/actions/workflows/docker.yml/badge.svg)](https://github.com/spidyskip/pdftomd/actions/workflows/docker.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![React 18](https://img.shields.io/badge/react-18-61DAFB.svg?logo=react)](https://react.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -145,19 +146,35 @@ Open **http://localhost:5173**
 
 ### 3. Docker (Recommended)
 
+**Option A: Pre-built images (fastest)**
+```bash
+# Uses images from GitHub Container Registry
+docker compose -f docker-compose.prod.yml up -d
+
+# With Ollama
+docker compose -f docker-compose.prod.yml --profile ollama up -d
+```
+
+**Option B: Build from source**
 ```bash
 # Start all services
 docker compose up -d --build
 
-# Start with Ollama container
+# With Ollama
 docker compose --profile ollama up -d --build
+```
 
+**Common commands:**
+```bash
 # View logs
 docker compose logs -f backend
 docker compose logs -f frontend
 
 # Stop all
 docker compose down
+
+# Rebuild after code changes
+docker compose down && docker compose up -d --build
 ```
 
 **For MLX with Docker**, create a `.env` file:

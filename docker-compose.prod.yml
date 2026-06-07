@@ -1,0 +1,55 @@
+services:
+  backend:
+    image: ghcr.io/spidyskip/pdftomd-backend:latest
+    container_name: pdfmd-backend
+    ports:
+      - "8000:8000"
+    environment:
+      OCR_BACKEND: ${OCR_BACKEND:-markitdown}
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      MLX_URL: ${MLX_URL:-http://${HOST_IP:-host.docker.internal}:8080}
+      MARKITDOWN_CLI: markitdown
+      AUTO_PULL_MODEL: "true"
+      UPLOAD_DIR: /app/uploads
+      RESULT_DIR: /app/results
+    volumes:
+      - uploads:/app/uploads
+      - results:/app/results
+      - data:/app/data
+    depends_on:
+      ollama:
+        condition: service_healthy
+        required: false
+    restart: unless-stopped
+
+  frontend:
+    image: ghcr.io/spidyskip/pdftomd-frontend:latest
+    container_name: pdfmd-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Optional: Ollama service (only started with --profile ollama)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: pdfmd-ollama
+    profiles:
+      - ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  ollama-data:
+  uploads:
+  results:
+  data:
