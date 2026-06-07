@@ -79,3 +79,67 @@ async def switch_backend(req: BackendSwitchRequest):
         "status": "switched",
         "model": client.model,
     }
+
+
+class BackendCheckRequest(BaseModel):
+    url: str
+
+
+@router.post("/backend/check")
+async def check_backend(req: BackendCheckRequest):
+    """Server-side check of an arbitrary backend URL (avoids CORS on the client).
+
+    Returns availability for both Ollama-style and MLX-style endpoints discovered at the URL.
+    """
+    url = req.url.rstrip("/")
+    # Instantiate lightweight clients pointing at the provided URL
+    from app.services.ollama import OllamaClient
+    from app.services.mlx import MlxClient
+    ollama = OllamaClient(base_url=url)
+    mlx = MlxClient(base_url=url)
+
+    # Run checks in parallel
+    import asyncio
+
+    async def check_ollama():
+        try:
+            avail = await ollama.health_check()
+            loaded = await ollama.is_model_loaded() if avail else False
+            return {"available": avail, "model_loaded": loaded}
+        except Exception:
+            return {"available": False, "model_loaded": False}
+
+    async def check_mlx():
+        try:
+            avail = await mlx.health_check()
+            loaded = await mlx.is_model_loaded() if avail else False
+            return {"available": avail, "model_loaded": loaded}
+        except Exception:
+            return {"available": False, "model_loaded": False}
+
+    ollama_res, mlx_res = await asyncio.gather(check_ollama(), check_mlx())
+
+    return {
+        "url": url,
+        "ollama": ollama_res,
+        "mlx": mlx_res,
+        "reachable": ollama_res["available"] or mlx_res["available"],
+    }
+
+
+class BackendUrlRequest(BaseModel):
+    backend: str
+    url: str
+
+
+@router.post("/backend/url")
+async def set_backend_url(req: BackendUrlRequest):
+    """Set the configured URL for an engine (ollama or mlx)."""
+    b = req.backend.lower()
+    if b not in ("ollama", "mlx"):
+        return {"error": "backend must be 'ollama' or 'mlx'"}
+    if b == "ollama":
+        settings.ollama_url = req.url.rstrip("/")
+    else:
+        settings.mlx_url = req.url.rstrip("/")
+    return {"backend": b, "url": req.url}

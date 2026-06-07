@@ -51,4 +51,16 @@ export const backendApi = {
       method: "POST",
       body: JSON.stringify({ backend }),
     }),
+  checkCustom: (url: string) => request<{ url: string; reachable: boolean; ollama: { available: boolean; model_loaded: boolean }; mlx: { available: boolean; model_loaded: boolean } }>(
+    "/backend/check",
+    {
+      method: "POST",
+      body: JSON.stringify({ url }),
+    }
+  ),
+  setUrl: (backend: string, url: string) =>
+    request<{ backend: string; url: string }>("/backend/url", {
+      method: "POST",
+      body: JSON.stringify({ backend, url }),
+    }),
 };

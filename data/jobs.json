@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "be44d7e6",
+    "filename": "Fundamentals of Data Engineering (Reis, JoeHousley, Matt) (Z-Library) (trascinato).pdf",
+    "status": "failed",
+    "progress": 90,
+    "status_text": "Extracting text from page 1 of 1",
+    "page_count": 1,
+    "error": "Cannot connect to MLX server at http://localhost:8080. Make sure mlx-vlm is running: mlx_vlm.server --trust-remote-code",
+    "created": "2026-06-07T08:06:11.671777+00:00"
+  },
+  {
+    "id": "67053839",
+    "filename": "Fundamentals of Data Engineering (Reis, JoeHousley, Matt) (Z-Library) (trascinato).pdf",
+    "status": "finished",
+    "progress": 100,
+    "status_text": "Done",
+    "page_count": 1,
+    "error": null,
+    "created": "2026-06-07T08:16:51.213021+00:00"
+  }
+]

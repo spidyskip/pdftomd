@@ -30,13 +30,23 @@ export default function LivePreview({ job, onClose }: Props) {
         if (matches) setCurrentPage(matches.length - 1);
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "";
-      if (msg.includes("202") || msg.includes("no output yet")) {
-        setError("Processing in progress — output will appear here as pages are extracted…");
-      } else if (msg.includes("404")) {
-        setError("Waiting for output…");
+      // jobsApi.getResult throws ApiError with a `status` field for non-OK responses
+      const apiErr: any = err as any;
+      if (apiErr && typeof apiErr.status === "number") {
+        if (apiErr.status === 202) {
+          setError("Processing in progress — output will appear here as pages are extracted…");
+        } else if (apiErr.status === 404) {
+          setError("Waiting for output…");
+        } else {
+          setError(null);
+        }
       } else {
-        setError(null);
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes("no output yet")) {
+          setError("Processing in progress — output will appear here as pages are extracted…");
+        } else {
+          setError(null);
+        }
       }
       setIsLoading(false);
     }

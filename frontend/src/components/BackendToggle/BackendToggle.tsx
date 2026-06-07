@@ -53,22 +53,13 @@ export default function BackendToggle() {
     return () => clearInterval(i);
   }, [backend]);
 
-  // Live check custom endpoint
+  // Live check custom endpoint (via backend proxy to avoid CORS)
   const checkCustomEndpoint = useCallback(async (url: string) => {
     if (!url) { setCustomOk(null); return; }
     setCustomChecking(true);
-    const base = url.replace(/\/$/, "");
     try {
-      const ollamaCheck = fetch(`${base}/api/tags`, { signal: AbortSignal.timeout(3000) }).then(r => r.ok).catch(() => false);
-      const body = JSON.stringify({ model: "test", messages: [{ role: "user", content: [{ type: "text", text: "hi" }] }], max_tokens: 1 });
-      const mlxCheck = fetch(`${base}/v1/chat/completions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body,
-        signal: AbortSignal.timeout(3000),
-      }).then(r => r.ok || r.status === 400).catch(() => false);
-      const [ollamaOk, mlxOk] = await Promise.all([ollamaCheck, mlxCheck]);
-      setCustomOk(ollamaOk || mlxOk);
+      const res = await backendApi.checkCustom(url);
+      setCustomOk(Boolean(res.reachable));
     } catch {
       setCustomOk(false);
     }
@@ -92,10 +83,37 @@ export default function BackendToggle() {
     if (switching) return;
     setSwitching(true);
     try {
-      await backendApi.switch(engine);
-      setBackend(engine);
+      if (engine === "custom") {
+        // Set the MLX URL on the server, then switch the active backend to MLX.
+        await backendApi.setUrl("mlx", customUrl);
+        await backendApi.switch("mlx");
+        // Keep UI showing 'Custom' as the selected label
+        setBackend("custom");
+      } else {
+        await backendApi.switch(engine);
+        setBackend(engine);
+      }
+
+      // Refresh configured URLs and health status
+      const cfg = await backendApi.get();
+      setOllamaUrl(cfg.ollama_url);
+      setMlxUrl(cfg.mlx_url);
+
+      try {
+        const h = await healthApi.checkAll() as any;
+        setOllamaOk(h.ollama.available && h.ollama.model_loaded);
+        setMlxOk(h.mlx.available && h.mlx.model_loaded);
+      } catch {
+        setOllamaOk(false);
+        setMlxOk(false);
+      }
+
+      // Re-check custom endpoint status
+      checkCustomEndpoint(customUrl);
       setOpen(false);
-    } catch { /* ignore */ }
+    } catch (e) {
+      // ignore for now
+    }
     setSwitching(false);
   };
 

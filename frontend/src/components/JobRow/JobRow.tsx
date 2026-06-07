@@ -48,8 +48,8 @@ export default function JobRow({ job }: Props) {
 
   const handleView = async () => {
     try {
-      const text = await jobsApi.getResult(job.id);
-      showPreview(text, job.filename);
+      // Open preview by job id and let the preview component fetch and poll the result.
+      showPreview(job.id, job.filename);
     } catch (error: unknown) {
       showToast(error instanceof Error ? error.message : "Preview failed", "error");
     }
