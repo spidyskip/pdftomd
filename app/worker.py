@@ -40,8 +40,14 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ocr_client=N
                 status_text=f"Extracting text from page {page_num} of {total}",
                 progress=int((page_num / total) * 80) + 10,
             )
-            text = await client.ocr_image(img_path)
-            pages.append(f"## Page {page_num}\n\n{text}")
+            try:
+                text = await client.ocr_image(img_path)
+                pages.append(f"## Page {page_num}\n\n{text}")
+            except Exception as e:
+                # Record the failure for this page but continue processing remaining pages
+                err_msg = f"**Error extracting page {page_num}: {e}**"
+                pages.append(f"## Page {page_num}\n\n{err_msg}")
+                await store.update(job_id, status_text=f"Error on page {page_num}; continuing", progress=int(((page_num + 0.5) / total) * 80) + 10)
 
             # Write partial result so live preview can read it
             partial_md = "\n\n---\n\n".join(pages)
