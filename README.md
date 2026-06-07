@@ -6,15 +6,18 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-Convert PDF documents to structured Markdown using **GLM-OCR**. Supports both **Ollama** and **MLX** (Apple Silicon) backends with a modern React frontend.
+Convert PDF documents to structured Markdown using AI-powered OCR engines. Supports **Ollama**, **MLX** (Apple Silicon), and **Markitdown** backends with a modern React frontend.
 
 ## Features
 
-- **Dual OCR Backend** — Switch between Ollama and MLX (Apple Silicon) at runtime
+- **Multi-Engine OCR** — Switch between Ollama, MLX (Apple Silicon), and Markitdown at runtime
+- **Markitdown Support** — Native PDF-to-Markdown conversion without OCR (with optional `markitdown-ocr` plugin for scanned PDFs)
+- **Collapsible Job List** — Jobs organized into "In progress" and "Completed" sections with engine badges
 - **Live Preview** — Watch markdown output update in real-time as each page is processed
 - **Rich Progress Tracking** — 4-step progress indicator with per-page status
-- **Connection Status** — Live health monitoring for both backends with availability indicators
+- **Connection Status** — Live health monitoring with color-coded indicators (green/red/yellow)
 - **Export** — Download results as Markdown files
+- **Docker Deployment** — Full Docker Compose setup with backend, frontend, and optional Ollama
 - **MCP Endpoint** — AI agent integration via `/mcp` (Model Context Protocol)
 - **Neo-Brutalist UI** — Notion-Ink inspired design with hard shadows and thick borders
 
@@ -23,7 +26,7 @@ Convert PDF documents to structured Markdown using **GLM-OCR**. Supports both **
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
 │  React + Vite   │────▶│   FastAPI        │────▶│  Ollama / MLX   │
-│  Frontend :5173 │     │   Backend :8000  │     │  GLM-OCR Model  │
+│  Frontend :5173 │     │   Backend :8000  │     │  / Markitdown   │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
                                │
                         ┌──────┴──────┐
@@ -39,23 +42,75 @@ Convert PDF documents to structured Markdown using **GLM-OCR**. Supports both **
 - Python 3.10+
 - Node.js 18+
 
-### Ollama Backend
-- [Ollama](https://ollama.com/) installed and running
-- GLM-OCR model: `ollama pull glm-ocr`
+### OCR Engine Setup
 
-### MLX Backend (Apple Silicon)
-- Apple Silicon Mac (M series chip)
-- macOS 14.0 (Sonoma) or later
+#### Option 1: Ollama (Cross-platform)
 
+**Install Ollama:** [https://ollama.com/download](https://ollama.com/download)
+
+**Pull the GLM-OCR model:**
+```bash
+ollama pull glm-ocr
+```
+
+**Start Ollama:**
+```bash
+ollama serve
+# Runs on http://localhost:11434 by default
+```
+
+**Project config:**
+```bash
+# .env or environment variables
+OCR_BACKEND=ollama
+OLLAMA_URL=http://localhost:11434
+MODEL_NAME=glm-ocr
+```
+
+#### Option 2: MLX (Apple Silicon only)
+
+**Requirements:** Apple Silicon Mac (M1/M2/M3/M4), macOS 14.0+
+
+**Install mlx-vlm:**
 ```bash
 python3 -m venv .venv-mlx
 source .venv-mlx/bin/activate
 pip install git+https://github.com/Blaizzy/mlx-vlm.git
+```
 
-# Start MLX server (default port 8080)
+**Start MLX server:**
+```bash
+# Default port 8080
 mlx_vlm.server --trust-remote-code --port 8080
 
-# Or use MLX Studio which runs on port 8080
+# Or specify a model
+mlx_vlm.server --model mlx-community/GLM-OCR-bf16 --trust-remote-code --port 8080
+```
+
+**Alternative: MLX Studio** — GUI app for running MLX models: [https://github.com/Blaizzy/mlx-studio](https://github.com/Blaizzy/mlx-studio)
+
+**Project config:**
+```bash
+OCR_BACKEND=mlx
+MLX_URL=http://localhost:8080
+MLX_MODEL=mlx-community/GLM-OCR-bf16
+```
+
+#### Option 3: Markitdown (No server required)
+
+**Install:**
+```bash
+pip install markitdown[pdf]
+```
+
+**Optional OCR plugin** (for scanned PDFs):
+```bash
+pip install markitdown-ocr
+```
+
+**Project config:**
+```bash
+OCR_BACKEND=markitdown
 ```
 
 ## Quick Start
@@ -73,6 +128,9 @@ OLLAMA_URL=http://localhost:11434 uvicorn main:app --reload --port 8000
 
 # For MLX
 OCR_BACKEND=mlx MLX_URL=http://localhost:8080 uvicorn main:app --reload --port 8000
+
+# For Markitdown
+OCR_BACKEND=markitdown uvicorn main:app --reload --port 8000
 ```
 
 ### 2. Frontend
@@ -84,6 +142,29 @@ npm run dev
 ```
 
 Open **http://localhost:5173**
+
+### 3. Docker (Recommended)
+
+```bash
+# Start all services
+docker compose up -d --build
+
+# Start with Ollama container
+docker compose --profile ollama up -d --build
+
+# View logs
+docker compose logs -f backend
+docker compose logs -f frontend
+
+# Stop all
+docker compose down
+```
+
+**For MLX with Docker**, create a `.env` file:
+```env
+HOST_IP=YOUR_HOST_IP
+```
+Find your IP: `ifconfig | grep "inet " | grep -v 127.0.0.1`
 
 ## API Endpoints
 
@@ -103,5 +184,9 @@ Open **http://localhost:5173**
 
 - **Backend**: FastAPI, Pydantic, httpx, MCP
 - **Frontend**: React 18, TypeScript, Vite, CSS
-- **OCR**: GLM-OCR via Ollama or MLX
+- **OCR**: GLM-OCR via Ollama or MLX, Markitdown for native PDF conversion
 - **Design**: Notion-Ink Neo-Brutalist with Geist + JetBrains Mono
+
+## License
+
+[MIT](LICENSE)
