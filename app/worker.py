@@ -42,7 +42,22 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ocr_client=N
             )
             try:
                 text = await client.ocr_image(img_path)
-                pages.append(f"## Page {page_num}\n\n{text}")
+                # If the engine returned very short output, append a diagnostic note and save raw response for debugging
+                trimmed = (text or "").strip()
+                if len(trimmed) < 80:
+                    note = f"\n\n**Warning: short output ({len(trimmed)} chars). Check engine logs.**\n"
+                    raw = getattr(client, "_last_raw", None)
+                    if raw:
+                        # Save raw engine response for inspection
+                        debug_path = settings.result_dir / f"{job_id}_page_{page_num}.debug.txt"
+                        try:
+                            debug_path.write_text(raw, encoding="utf-8")
+                            note += f"\nRaw response saved: {debug_path}\n"
+                        except Exception:
+                            note += "\n(Raw response could not be saved)\n"
+                    pages.append(f"## Page {page_num}\n\n{trimmed}{note}")
+                else:
+                    pages.append(f"## Page {page_num}\n\n{trimmed}")
             except Exception as e:
                 # Record the failure for this page but continue processing remaining pages
                 err_msg = f"**Error extracting page {page_num}: {e}**"

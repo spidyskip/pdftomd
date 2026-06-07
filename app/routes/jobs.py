@@ -63,16 +63,21 @@ async def get_job(job_id: str):
     return job
 
 @router.get("/{job_id}/result", response_class=PlainTextResponse)
-async def get_result(job_id: str):
+async def get_result(job_id: str, final: bool = False):
     store = get_store()
     job = await store.get(job_id)
     if not job:
         raise HTTPException(404, "Job not found")
     out_path = settings.result_dir / f"{job_id}.md"
+    # If the caller requests the final result, don't return partial output while processing
+    if final and job.status != JobStatus.FINISHED:
+        raise HTTPException(202, "Processing in progress — final result not ready")
+
     if not out_path.exists():
         if job.status == JobStatus.PROCESSING:
             raise HTTPException(202, "Processing in progress — no output yet")
         raise HTTPException(404, "Result not found")
+
     return out_path.read_text(encoding="utf-8")
 
 @router.delete("/{job_id}")

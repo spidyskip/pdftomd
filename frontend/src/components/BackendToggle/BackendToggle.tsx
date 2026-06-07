@@ -14,7 +14,7 @@ interface BackendConfig {
 export default function BackendToggle() {
   const [backend, setBackend] = useState<Engine>("ollama");
   const [ollamaUrl, setOllamaUrl] = useState("http://localhost:11434");
-  const [mlxUrl, setMlxUrl] = useState("http://localhost:8081");
+  const [mlxUrl, setMlxUrl] = useState("http://localhost:8080");
   const [ollamaOk, setOllamaOk] = useState<boolean | null>(null);
   const [mlxOk, setMlxOk] = useState<boolean | null>(null);
   const [customUrl, setCustomUrl] = useState("http://localhost:8080");

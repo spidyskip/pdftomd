@@ -35,7 +35,7 @@ export const jobsApi = {
     formData.append("file", file);
     return request<Job>("/jobs", { method: "POST", body: formData });
   },
-  getResult: (id: string) => fetchText(`/jobs/${id}/result`),
+  getResult: (id: string, final = false) => fetchText(`/jobs/${id}/result${final ? '?final=1' : ''}`),
   delete: (id: string) => request<{ deleted: string }>(`/jobs/${id}`, { method: "DELETE" }),
 };
 
