@@ -31,7 +31,11 @@ export default function ConnectionStatus() {
 
   const isConnected = health?.available && health?.model_loaded;
   const isPartial = health?.available && !health?.model_loaded;
-  const backendLabel = health?.backend === "mlx" ? "MLX" : "Ollama";
+  const backendLabel = health?.backend === "mlx"
+    ? "MLX"
+    : health?.backend === "markitdown"
+    ? "Markitdown"
+    : "Ollama";
 
   return (
     <div className={`conn-status ${checking ? "conn-status--checking" : ""} ${isConnected ? "conn-status--connected" : ""} ${isPartial ? "conn-status--partial" : ""} ${!checking && !isConnected && !isPartial ? "conn-status--error" : ""}`}>

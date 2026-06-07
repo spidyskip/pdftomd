@@ -45,7 +45,7 @@ export const healthApi = {
 };
 
 export const backendApi = {
-  get: () => request<{ backend: string; ollama_url: string; mlx_url: string; mlx_model: string }>("/backend"),
+  get: () => request<{ backend: string; ollama_url: string; mlx_url: string; mlx_model: string; markitdown_path: string }>("/backend"),
   switch: (backend: string) =>
     request<{ backend: string; status: string; model: string }>("/backend", {
       method: "POST",

@@ -14,7 +14,12 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ocr_client=N
         return
 
     client = ocr_client if ocr_client is not None else get_ocr_client()
-    backend_label = "MLX" if settings.ocr_backend == OcrBackend.MLX else "Ollama"
+    if settings.ocr_backend == OcrBackend.MARKITDOWN:
+        backend_label = "Markitdown"
+    elif settings.ocr_backend == OcrBackend.MLX:
+        backend_label = "MLX"
+    else:
+        backend_label = "Ollama"
 
     await store.update(job_id, status=JobStatus.PROCESSING, progress=0)
 
@@ -24,6 +29,20 @@ async def process_job(job_id: str, pdf_path: Path, store: JobStore, ocr_client=N
             await client.ensure_model()
         except Exception as e:
             await store.update(job_id, status=JobStatus.FAILED, error=str(e))
+            return
+
+        if settings.ocr_backend == OcrBackend.MARKITDOWN:
+            await store.update(job_id, status_text="Converting PDF with Markitdown…")
+            markdown = await client.convert_pdf(pdf_path)
+            out_path = settings.result_dir / f"{job_id}.md"
+            out_path.write_text(markdown, encoding="utf-8")
+            await store.update(
+                job_id,
+                page_count=1,
+                status=JobStatus.FINISHED,
+                progress=100,
+                status_text="Done",
+            )
             return
 
         await store.update(job_id, status_text="Converting PDF to images…")

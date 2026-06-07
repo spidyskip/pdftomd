@@ -7,12 +7,13 @@ from enum import Enum
 class OcrBackend(str, Enum):
     OLLAMA = "ollama"
     MLX = "mlx"
+    MARKITDOWN = "markitdown"
 
 
 class Settings(BaseSettings):
     model_config = ConfigDict(env_prefix="")
 
-    # OCR backend selection: "ollama" or "mlx"
+    # OCR backend selection: "ollama", "mlx", or "markitdown"
     ocr_backend: OcrBackend = OcrBackend.MLX
 
     # Ollama settings
@@ -23,6 +24,9 @@ class Settings(BaseSettings):
     # MLX settings
     mlx_url: str = "http://localhost:8080"
     mlx_model: str = "mlx-community/GLM-OCR-bf16"
+
+    # Markitdown settings
+    markitdown_cli: str = "markitdown"
 
     # General
     upload_dir: Path = Path("uploads")

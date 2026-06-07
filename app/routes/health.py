@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.dependencies import get_ocr_client, get_ollama, get_mlx
+from app.dependencies import get_ocr_client, get_ollama, get_mlx, get_markitdown
 from app.config import settings, OcrBackend
 
 router = APIRouter()
@@ -13,7 +13,7 @@ async def health():
     loaded = await client.is_model_loaded()
     return {
         "available": available,
-        "model": client.model,
+        "model": getattr(client, "model", None) or getattr(client, "cli_path", None),
         "model_loaded": loaded,
         "backend": settings.ocr_backend.value,
     }
@@ -31,6 +31,10 @@ async def health_all():
     mlx_avail = await mlx.health_check()
     mlx_loaded = await mlx.is_model_loaded() if mlx_avail else False
 
+    markitdown = get_markitdown()
+    markitdown_avail = await markitdown.health_check()
+    markitdown_loaded = await markitdown.is_model_loaded() if markitdown_avail else False
+
     return {
         "active": settings.ocr_backend.value,
         "ollama": {
@@ -45,6 +49,11 @@ async def health_all():
             "model": mlx.model,
             "url": settings.mlx_url,
         },
+        "markitdown": {
+            "available": markitdown_avail,
+            "model_loaded": markitdown_loaded,
+            "path": settings.markitdown_cli,
+        },
     }
 
 
@@ -55,6 +64,7 @@ async def get_backend():
         "ollama_url": settings.ollama_url,
         "mlx_url": settings.mlx_url,
         "mlx_model": settings.mlx_model,
+        "markitdown_path": settings.markitdown_cli,
     }
 
 
@@ -70,15 +80,19 @@ async def switch_backend(req: BackendSwitchRequest):
     try:
         new_backend = OcrBackend(req.backend)
     except ValueError:
-        return {"error": f"Invalid backend: {req.backend}. Use 'ollama' or 'mlx'."}
+        return {"error": f"Invalid backend: {req.backend}. Use 'ollama', 'mlx', or 'markitdown'."}
 
     settings.ocr_backend = new_backend
     client = get_ocr_client()
-    return {
+    response = {
         "backend": settings.ocr_backend.value,
         "status": "switched",
-        "model": client.model,
     }
+    if hasattr(client, "model"):
+        response["model"] = client.model
+    elif hasattr(client, "cli_path"):
+        response["model"] = client.cli_path
+    return response
 
 
 class BackendCheckRequest(BaseModel):

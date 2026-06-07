@@ -2,21 +2,24 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { backendApi, healthApi } from "../../api/client";
 import "./BackendToggle.css";
 
-type Engine = "ollama" | "mlx" | "custom";
+type Engine = "ollama" | "mlx" | "markitdown" | "custom";
 
 interface BackendConfig {
   backend: string;
   ollama_url: string;
   mlx_url: string;
   mlx_model: string;
+  markitdown_path: string;
 }
 
 export default function BackendToggle() {
   const [backend, setBackend] = useState<Engine>("ollama");
   const [ollamaUrl, setOllamaUrl] = useState("http://localhost:11434");
   const [mlxUrl, setMlxUrl] = useState("http://localhost:8080");
+  const [markitdownPath, setMarkitdownPath] = useState("markitdown");
   const [ollamaOk, setOllamaOk] = useState<boolean | null>(null);
   const [mlxOk, setMlxOk] = useState<boolean | null>(null);
+  const [markitdownOk, setMarkitdownOk] = useState<boolean | null>(null);
   const [customUrl, setCustomUrl] = useState("http://localhost:8080");
   const [customOk, setCustomOk] = useState<boolean | null>(null);
   const [customChecking, setCustomChecking] = useState(false);
@@ -30,6 +33,7 @@ export default function BackendToggle() {
       setBackend(d.backend as Engine);
       setOllamaUrl(d.ollama_url);
       setMlxUrl(d.mlx_url);
+      setMarkitdownPath(d.markitdown_path || "markitdown");
     }).catch(() => {});
   }, []);
 
@@ -40,12 +44,15 @@ export default function BackendToggle() {
         const h = await healthApi.checkAll() as {
           ollama: { available: boolean; model_loaded: boolean };
           mlx: { available: boolean; model_loaded: boolean };
+          markitdown: { available: boolean; model_loaded: boolean };
         };
         setOllamaOk(h.ollama.available && h.ollama.model_loaded);
         setMlxOk(h.mlx.available && h.mlx.model_loaded);
+        setMarkitdownOk(h.markitdown.available && h.markitdown.model_loaded);
       } catch {
         setOllamaOk(false);
         setMlxOk(false);
+        setMarkitdownOk(false);
       }
     };
     check();
@@ -87,7 +94,6 @@ export default function BackendToggle() {
         // Set the MLX URL on the server, then switch the active backend to MLX.
         await backendApi.setUrl("mlx", customUrl);
         await backendApi.switch("mlx");
-        // Keep UI showing 'Custom' as the selected label
         setBackend("custom");
       } else {
         await backendApi.switch(engine);
@@ -98,14 +104,17 @@ export default function BackendToggle() {
       const cfg = await backendApi.get();
       setOllamaUrl(cfg.ollama_url);
       setMlxUrl(cfg.mlx_url);
+      setMarkitdownPath(cfg.markitdown_path || "markitdown");
 
       try {
         const h = await healthApi.checkAll() as any;
         setOllamaOk(h.ollama.available && h.ollama.model_loaded);
         setMlxOk(h.mlx.available && h.mlx.model_loaded);
+        setMarkitdownOk(h.markitdown.available && h.markitdown.model_loaded);
       } catch {
         setOllamaOk(false);
         setMlxOk(false);
+        setMarkitdownOk(false);
       }
 
       // Re-check custom endpoint status
@@ -117,9 +126,27 @@ export default function BackendToggle() {
     setSwitching(false);
   };
 
-  const activeOk = backend === "ollama" ? ollamaOk : backend === "mlx" ? mlxOk : customOk;
-  const activeUrl = backend === "ollama" ? ollamaUrl : backend === "mlx" ? mlxUrl : customUrl;
-  const activeLabel = backend === "ollama" ? "Ollama" : backend === "mlx" ? "MLX" : "Custom";
+  const activeOk = backend === "ollama"
+    ? ollamaOk
+    : backend === "mlx"
+    ? mlxOk
+    : backend === "markitdown"
+    ? markitdownOk
+    : customOk;
+  const activeUrl = backend === "ollama"
+    ? ollamaUrl
+    : backend === "mlx"
+    ? mlxUrl
+    : backend === "markitdown"
+    ? markitdownPath
+    : customUrl;
+  const activeLabel = backend === "ollama"
+    ? "Ollama"
+    : backend === "mlx"
+    ? "MLX"
+    : backend === "markitdown"
+    ? "Markitdown"
+    : "Custom";
 
   return (
     <div className="engine-selector" ref={ref}>
@@ -151,6 +178,17 @@ export default function BackendToggle() {
               </span>
             </span>
             <span className={`engine-btn-dot ${mlxOk === true ? "engine-btn-dot--online" : mlxOk === false ? "engine-btn-dot--offline" : "engine-btn-dot--unknown"}`} style={{width:6,height:6}} />
+          </button>
+
+          <button className={`engine-option ${backend === "markitdown" ? "engine-option--active" : ""}`} onClick={() => handleSwitch("markitdown")} disabled={switching}>
+            <span className="engine-option-left">
+              <svg className="engine-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>
+              <span className="engine-option-info">
+                <span className="engine-option-name">Markitdown</span>
+                <span className="engine-option-url">{markitdownPath}</span>
+              </span>
+            </span>
+            <span className={`engine-btn-dot ${markitdownOk === true ? "engine-btn-dot--online" : markitdownOk === false ? "engine-btn-dot--offline" : "engine-btn-dot--unknown"}`} style={{width:6,height:6}} />
           </button>
 
           <div className="engine-divider" />
