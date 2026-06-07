@@ -39,7 +39,7 @@ export default function ConnectionStatus() {
       <span className="conn-label">
         {checking ? "Checking…" : isConnected ? `${backendLabel} connected` : isPartial ? `${backendLabel} model not loaded` : `${backendLabel} offline`}
       </span>
-      {health && (
+      {health && isConnected && (
         <span className="conn-model">{health.model}</span>
       )}
     </div>
