@@ -194,11 +194,22 @@
   transform: translate(-1px, -1px);
 }
 
-.engine-custom-hint {
-  font-size: 0.6rem;
-  color: var(--text-muted);
+.engine-custom-status {
   margin-top: 4px;
-  line-height: 1.3;
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.engine-custom-checking {
+  color: var(--text-muted);
+}
+
+.engine-custom-ok {
+  color: var(--success);
+}
+
+.engine-custom-fail {
+  color: var(--error);
 }
 
 /* Status bar at bottom */
@@ -220,6 +231,16 @@
 .engine-status-text {
   font-size: 0.65rem;
   color: var(--text-muted);
+}
+
+.engine-status-url {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 640px) {

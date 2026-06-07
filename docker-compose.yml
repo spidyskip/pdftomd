@@ -1,17 +1,4 @@
 services:
-  ollama:
-    image: ollama/ollama:latest
-    container_name: pdfmd-ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama-data:/root/.ollama
-    healthcheck:
-      test: ["CMD", "ollama", "list"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: .
@@ -20,8 +7,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      OCR_BACKEND: ollama
-      OLLAMA_URL: http://ollama:11434
+      OCR_BACKEND: ${OCR_BACKEND:-ollama}
+      OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+      MLX_URL: ${MLX_URL:-http://localhost:8080}
       AUTO_PULL_MODEL: "true"
       UPLOAD_DIR: /app/uploads
       RESULT_DIR: /app/results
@@ -32,6 +20,7 @@ services:
     depends_on:
       ollama:
         condition: service_healthy
+        required: false
 
   frontend:
     build:
@@ -43,6 +32,22 @@ services:
       VITE_API_URL: http://localhost:8000
     depends_on:
       - backend
+
+  # Optional: Ollama service (only started with --profile ollama)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: pdfmd-ollama
+    profiles:
+      - ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   ollama-data:
