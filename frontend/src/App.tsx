@@ -6,6 +6,7 @@ import Toast from "./components/Toast/Toast";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
 import ConnectionStatus from "./components/ConnectionStatus/ConnectionStatus";
 import BackendToggle from "./components/BackendToggle/BackendToggle";
+import MarkdownIcon from "./components/MarkdownIcon/MarkdownIcon";
 import "./App.css";
 
 function App() {
@@ -15,7 +16,10 @@ function App() {
         <div className="app">
           <header className="app-header">
             <div className="app-header-top">
-              <h1>PDF to Markdown</h1>
+              <div className="app-logo">
+                <MarkdownIcon size={28} className="app-logo-icon" />
+                <h1>PDF to Markdown</h1>
+              </div>
               <div className="app-header-right">
                 <BackendToggle />
                 <ConnectionStatus />

@@ -9,6 +9,7 @@ export interface Job {
   page_count: number | null;
   error: string | null;
   created: string;
+  engine?: string;
 }
 
 export interface HealthResponse {
