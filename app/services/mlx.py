@@ -24,7 +24,7 @@ class MlxClient:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 # Try a minimal POST to /chat/completions — mlx-vlm responds even to short requests
                 r = await client.post(
-                    f"{self.base_url}/chat/completions",
+                    f"{self.base_url}/v1/chat/completions",
                     json={
                         "model": self.model,
                         "messages": [{"role": "user", "content": [{"type": "text", "text": "hi"}]}],
@@ -44,7 +44,7 @@ class MlxClient:
         try:
             async with httpx.AsyncClient(timeout=10.0) as client:
                 r = await client.post(
-                    f"{self.base_url}/chat/completions",
+                    f"{self.base_url}/v1/chat/completions",
                     json={
                         "model": self.model,
                         "messages": [{"role": "user", "content": [{"type": "text", "text": "hi"}]}],
@@ -90,7 +90,7 @@ class MlxClient:
         try:
             async with httpx.AsyncClient(timeout=300.0) as client:
                 r = await client.post(
-                    f"{self.base_url}/chat/completions",
+                    f"{self.base_url}/v1/chat/completions",
                     json=payload,
                 )
                 if r.status_code == 500:

@@ -60,23 +60,21 @@ export default function BackendToggle() {
   const checkCustomEndpoint = useCallback(async (url: string) => {
     if (!url) { setCustomOk(null); return; }
     setCustomChecking(true);
+    const base = url.replace(/\/$/, "");
     try {
-      const r = await fetch(`${url.replace(/\/$/, "")}/api/tags`, { signal: AbortSignal.timeout(3000) });
-      setCustomOk(r.ok);
+      // Try both Ollama (/api/tags) and MLX (/v1/chat/completions) in parallel
+      const ollamaCheck = fetch(`${base}/api/tags`, { signal: AbortSignal.timeout(3000) }).then(r => r.ok).catch(() => false);
+      const body = JSON.stringify({ model: "test", messages: [{ role: "user", content: [{ type: "text", text: "hi" }] }], max_tokens: 1 });
+      const mlxCheck = fetch(`${base}/v1/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+        signal: AbortSignal.timeout(3000),
+      }).then(r => r.ok || r.status === 400).catch(() => false);
+      const [ollamaOk, mlxOk] = await Promise.all([ollamaCheck, mlxCheck]);
+      setCustomOk(ollamaOk || mlxOk);
     } catch {
-      // Try /v1/chat/completions as fallback (MLX)
-      try {
-        const body = JSON.stringify({ model: "test", messages: [{ role: "user", content: [{ type: "text", text: "hi" }] }], max_tokens: 1 });
-        const r = await fetch(`${url.replace(/\/$/, "")}/v1/chat/completions`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body,
-          signal: AbortSignal.timeout(3000),
-        });
-        setCustomOk(r.ok || r.status === 400);
-      } catch {
-        setCustomOk(false);
-      }
+      setCustomOk(false);
     }
     setCustomChecking(false);
   }, []);
